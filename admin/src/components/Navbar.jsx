@@ -137,6 +137,15 @@ const Navbar = () => {
               >
                 PROVIDERS
               </a>
+              <a
+                className={location.pathname==="/providers" ? 'my-2  transition-colors duration-300 transform dark:text-blue-500  md:mx-4 md:my-0' : 'my-2 text-white transition-colors duration-300 transform   md:mx-4 md:my-0'
+
+              } 
+                href="#"
+                onClick={()=>navigate('/coupons')}
+              >
+               Coupon
+              </a>
              
             </div>
 

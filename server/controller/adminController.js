@@ -12,16 +12,17 @@ const adminLogin = async (req, res) => {
     const adminy = await admin.findOne({ email })
 
     if (adminy && password === adminy.password) {
-const adminToken= await generateAdminToken(res,adminy._id)
-        res.status(200).json({ message: "success",
-    _id:adminy._id,
-    email:adminy.email,
-    adminToken
+        const adminToken = await generateAdminToken(res, adminy._id)
+        res.status(200).json({
+            message: "success",
+            _id: adminy._id,
+            email: adminy.email,
+            adminToken
 
-    })
-    console.log(adminToken,"?")
+        })
+        console.log(adminToken, "?")
     }
- 
+
     else {
         {
             res.json({ message: "wrong credentials" })

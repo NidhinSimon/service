@@ -15,13 +15,13 @@ const serviceSchema = mongoose.Schema({
     },
     category: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'category', 
+        ref: 'category',
         required: true
     },
-    image:{
-        type:String,
+    image: {
+        type: String,
     }
-  
+
 }, {
     timestamps: true
 });

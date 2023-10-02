@@ -5,11 +5,11 @@ import category from '../models/CategoryModel.js'
 const addcategory = async (req, res) => {
     console.log("?entered")
     const { name, categoryimage, location } = req.body
-    console.log(req.body,"??????????????????????????????????????///")
+    console.log(req.body, "??????????????????????????????????????///")
     const existingCategory = await category.findOne({ name, location });
 
     if (existingCategory) {
-      return res.status(400).json({ message: 'Category already exists' });
+        return res.status(400).json({ message: 'Category already exists' });
     }
     try {
         if (categoryimage) {
@@ -21,8 +21,6 @@ const addcategory = async (req, res) => {
                 name,
                 categoryimage: imageUrl,
                 location
-
-
             })
             await newCategory.save()
             res.status(201).json({ message: 'Category added successfully' });

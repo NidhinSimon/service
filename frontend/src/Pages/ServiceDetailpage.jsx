@@ -5,9 +5,12 @@ import axios from "axios";
 import { button } from "@material-tailwind/react";
 import Cart from "./Cart";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, removeFromCart } from "../components/Features/cartSlice";
+
 import Swal from "sweetalert2";
 import UserNav from "./UserNav";
+import { addToCart } from "../slices/userSlice";
+import { useAddCartMutation } from "../slices/backendSlice";
+
 const ServiceDetail = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(true);
 
@@ -16,6 +19,24 @@ const ServiceDetail = () => {
   const { id } = useParams();
   const [services, setServices] = useState([]);
   const [category, setCategory] = useState("");
+  const [cart, setCart] = useState([]);
+
+  const [add] = useAddCartMutation();
+
+  const { userInfo } = useSelector((state) => state.user);
+
+  const userid = userInfo.userExists._id;
+
+  console.log(userid, ">>>>>>>>>>>>>");
+
+  useEffect(() => {
+    const cartfetch = async () => {
+      const res = await axios.get(`http://localhost:5000/users/cart/${userid}`);
+      setCart(res.data);
+      console.log(res);
+    };
+    cartfetch();
+  }, [userid]);
 
   useEffect(() => {
     const servicesFetch = async () => {
@@ -35,18 +56,35 @@ const ServiceDetail = () => {
 
   const dispatch = useDispatch();
 
-  const cart = useSelector((state) => state.cart.cart);
+  const handleBook = async (service, userid) => {
+    // dispatch(addToCart(service));
+    const cartData = {
+      name: service.title,
+      price: service.price,
+      serviceId: service._id,
+    };
+    const res = await add({ cartData, userid }).unwrap();
+    setCart((prevCart) => [...prevCart, cartData]);
+    Swal.fire({
+      title: "Item Added to Cart",
+      text: "Service has been added to the cart",
+      icon: "success",
+    });
 
-  const handleBook = (service) => {
-    dispatch(addToCart(service));
+    console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>>>");
   };
 
   const handleDropdownToggle = () => {
     setIsDropdownVisible(!isDropdownVisible);
   };
-  const handleRemove = (item) => {
-    dispatch(removeFromCart(item));
+  const handleRemove = async (item) => {
+    // dispatch(removeFromCart(item));
 
+    await axios.delete(
+      `http://localhost:5000/users/cart/${userid}/${item.serviceId}`
+    );
+    const updatedcart = cart.filter((i) => i.serviceId !== item.serviceId);
+    setCart(updatedcart);
     Swal.fire({
       title: "Item Deleted",
       text: "Service Removed from the cart",
@@ -54,7 +92,6 @@ const ServiceDetail = () => {
     });
   };
 
-  const totalAmount = useSelector((state) => state.cart.totalAmount);
   return (
     <>
       <UserNav />
@@ -178,7 +215,7 @@ const ServiceDetail = () => {
                             <div className="card-actions align-middle justify-end">
                               <button
                                 className="btn btn-primary  text-white text-xs lg:w-28  sm:w-16 md:w-20   "
-                                onClick={() => handleBook(service)}
+                                onClick={() => handleBook(service, userid)}
                               >
                                 BOOK NOW
                               </button>
@@ -208,7 +245,7 @@ const ServiceDetail = () => {
                         <div className="bg-blue-200  rounded-xl w-auto h-auto ">
                           {cart.map((item) => (
                             <div className="flex justify-between p-2">
-                              <h1 className="text-lg">{item.title}</h1>
+                              <h1 className="text-lg">{item.name}</h1>
 
                               <p>{item.price}</p>
                               <button
@@ -220,7 +257,7 @@ const ServiceDetail = () => {
                             </div>
                           ))}
                           <div className="bg-indigo-500 text-white rounded-lg h-10 flex justify-between mt-2 ">
-                            <p className="ml-3 mt-1">₹{totalAmount}</p>
+                            {/* <p className="ml-3 mt-1">₹{totalAmount}</p> */}
                             <button
                               onClick={() => navigate("/checkout")}
                               className="mr-3"

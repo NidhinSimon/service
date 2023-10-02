@@ -30,9 +30,17 @@ export const usersApiSlice=apiSlice.injectEndpoints({
                 method:'POST'
             })
         }),
+        addCart:builder.mutation({
+            query:(data)=>({
+                url:`${USERS_URL}/cart`,
+                method:'POST',
+                body:data
+                
+            })
+        })
     })
 })
 
 export const {
-    useRegisterMutation,useLoginMutation,useLogoutMutation
+    useRegisterMutation,useLoginMutation,useLogoutMutation,useAddCartMutation
 }=usersApiSlice

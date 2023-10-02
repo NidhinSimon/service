@@ -15,6 +15,7 @@ import { PrimeReactProvider, PrimeReactContext } from 'primereact/api'
 import "primereact/resources/primereact.min.css"; ;
 import "primereact/resources/themes/lara-light-indigo/theme.css";  
 import AllProviders from "./components/AllProviders";
+import CouponList from "./components/Pages/CouponList";
 
  
 
@@ -34,6 +35,7 @@ function App() {
           <Route path='/users' element={<AllUsers/>}></Route>
           <Route path='/requests' element={<Requests/>}></Route>
           <Route path='/providers' element={<AllProviders/>}></Route>
+          <Route path="/coupons" element={<CouponList/>}/>
         </Routes>
 
 

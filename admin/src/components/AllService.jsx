@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 import { setCredentials } from "../../Redux/adminSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useEditServiceMutation } from "../../Redux/adminauth";
-import ProviderModal from '../components/Modals/ProviderModal'
+import ProviderModal from "../components/Modals/ProviderModal";
 
 const AllService = () => {
   const [edit] = useEditServiceMutation();
@@ -29,35 +29,29 @@ const AllService = () => {
     setIsOpen(true);
   };
 
-  
   const handleDelete = async (i) => {
-  
-      setItemToDelete(i);
-      setModalOpen(true);
-   
-   
+    setItemToDelete(i);
+    setModalOpen(true);
   };
 
-const confirmDelete=async(i)=>{
-  try {
-    
-    const res = await axios.delete(
-      `http://localhost:5000/admin/services/${itemToDelete._id}`
-    );
-    console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-    if (res.status === 200) {
-      toast.success("service deleted succesffully");
-      const updatedService = services.filter((s) => s._id !== itemToDelete._id);
-      setServices(updatedService);
-      setModalOpen(false)
+  const confirmDelete = async (i) => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:5000/admin/services/${itemToDelete._id}`
+      );
+      console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+      if (res.status === 200) {
+        toast.success("service deleted succesffully");
+        const updatedService = services.filter(
+          (s) => s._id !== itemToDelete._id
+        );
+        setServices(updatedService);
+        setModalOpen(false);
+      }
+    } catch (error) {
+      console.log(error.message);
     }
-  } catch (error) {
-    console.log(error.message)
-  }
-}
-
-
-
+  };
 
   useEffect(() => {
     const services = async () => {
@@ -98,13 +92,9 @@ const confirmDelete=async(i)=>{
     }
   };
 
-  const confirmclose=()=>{
-    setModalOpen(false)
-  }
-
-
-  
-
+  const confirmclose = () => {
+    setModalOpen(false);
+  };
 
   // const handleSubmit=async()=>{
 
@@ -126,7 +116,6 @@ const confirmDelete=async(i)=>{
 
       <div className="flex flex-col md:flex-row  ">
         <Toaster />
- 
 
         <div className="relative flex justify-center">
           {/* <button
@@ -135,19 +124,15 @@ const confirmDelete=async(i)=>{
     >
       Open Modal
     </button> */}
-<div className="relative flex justify-center items-center min-h-screen">
-
-
-{isModalOpen &&
-
-(
- <ProviderModal
- message="Are You Sure You want to delete the service"
- confirm={confirmDelete}
- onclose={confirmclose}
- />
-)}
-</div>
+          <div className="relative flex justify-center items-center min-h-screen">
+            {isModalOpen && (
+              <ProviderModal
+                message="Are You Sure You want to delete the service"
+                confirm={confirmDelete}
+                onclose={confirmclose}
+              />
+            )}
+          </div>
           {isOpen && (
             <div
               className="fixed inset-0 z-10 overflow-y-auto "
@@ -215,7 +200,7 @@ const confirmDelete=async(i)=>{
                         className="block w-full px-4 py-3 text-sm text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:focus:border-blue-300"
                       />
                     </label>
-                    
+
                     <label
                       htmlFor="emails-list"
                       className="text-sm text-gray-700 dark:text-gray-200"
@@ -294,7 +279,7 @@ const confirmDelete=async(i)=>{
                     Action
                   </th>
                   <th scope="col" className="px-6 py-3">
-                  CATEGORY
+                    CATEGORY
                   </th>
                 </tr>
               </thead>

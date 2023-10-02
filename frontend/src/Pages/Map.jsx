@@ -7,6 +7,12 @@ import mapboxgl from "mapbox-gl";
 import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import "mapbox-gl/dist/mapbox-gl.css";
 import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
+import { useState } from 'react';
+
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 function MapWithGeocoding() {
   const [userLocation, setUserLocation] = useState(null);
@@ -41,7 +47,7 @@ function MapWithGeocoding() {
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: "map", 
-      style: "mapbox://styles/mapbox/streets-v11",
+      style: "mapbox://styles/nidhinsimon/cln19ahu6015k01nshb484ghz",
       center: [-96, 37.8],
       zoom: 5,
     });
@@ -51,16 +57,14 @@ function MapWithGeocoding() {
     return () => map.remove();
   }, []);
 
+
+
+
   return (
     <div>
-      <button onClick={handleUseMyLocation}>Use My Location</button>
-      {userLocation && (
-        <div>
-          <p>Latitude: {userLocation.latitude}</p>
-          <p>Longitude: {userLocation.longitude}</p>
-          <p>Address: {userLocation.address}</p>
-        </div>
-      )}
+      <button onClick={handleUseMyLocation}>Use My dddLocation</button>
+      <h2>Select a Date and Time</h2>
+     
       <div id="map" className="w-full h-[400px]"></div>
     </div>
   );

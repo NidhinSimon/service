@@ -5,11 +5,14 @@ import Toast from "../../Pages/Toast";
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
+import Map from "./Map";
 
-const Signup = () => {
+const EmployeeSignup = () => {
+
+  const [click, setclick] = useState(false)
 
   const navigate=useNavigate()
-  const formArray = [1, 2, 3];
+  const formArray = [1, 2, 3,4];
   const [formNo, setFormNo] = useState(formArray[0]);
   const [previewImage, setPreviewImage] = useState(null);
   const [profilepreview, setprofilepreview] = useState(null);
@@ -20,6 +23,10 @@ const Signup = () => {
   const [verify, setVerify] = useState(false);
 
   const [category, setCategories] = useState([]);
+
+  const [longitude,setLongitude]=useState('')
+const [latitude,setLatitude]=useState('')
+const [address,setAddress]=useState('')
 
   const validationSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -104,6 +111,9 @@ const Signup = () => {
           ...value,
           licenseimage: licenseimage,
           profileimage: profileimage,
+          longitude:longitude,
+          latitude:latitude,
+          address:address
         });
         if (res.data.message === "provider added successfully") {
           toast.success("Data sent");
@@ -124,6 +134,17 @@ const Signup = () => {
     navigate('/login')
   };
 
+
+
+  const handlemap=async(longitude,latitude,address)=>{
+    setLatitude(latitude)
+setLongitude(longitude)
+setAddress(address)
+console.log(address,latitude,longitude)
+
+
+  }
+
   return (
     <>
       {verify && <Toast onClose={closeModal} />}
@@ -139,6 +160,126 @@ const Signup = () => {
                   "url('https://res.cloudinary.com/dj8z6xx94/image/upload/v1694407836/Screenshot_2023-09-11_101521_s0wmfr.png')",
               }}
             ></div>
+ {formNo === 3 && (
+              <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
+                <div className="flex justify-center mx-auto"></div>
+
+                <p className="mt-3 text-xl text-center text-black ">
+                  <ul className="flex items-center w-full p-3 space-x-2 text-sm font-medium text-center text-gray-500 bg-white border border-gray-200 rounded-lg shadow-sm dark:text-gray-400 sm:text-base dark:bg-gray-800 dark:border-gray-700 sm:p-4 sm:space-x-4">
+                    <li className="flex items-center text-blue-600 dark:text-blue-500">
+                      <span className="flex items-center justify-center w-5 h-5 mr-2 text-xs border border-blue-600 rounded-full shrink-0 dark:border-blue-500">
+                        1
+                      </span>
+                      Personl{" "}
+                      <span className="hidden sm:inline-flex sm:ml-2">
+                        Info
+                      </span>
+                      <svg
+                        className="w-3 h-3 ml-2 sm:ml-4"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 12 10"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m7 9 4-4-4-4M1 9l4-4-4-4"
+                        />
+                      </svg>
+                    </li>
+                    <li className="flex items-center">
+                      <span className="flex items-center justify-center w-5 h-5 mr-2 text-xs border border-gray-500 rounded-full shrink-0 dark:border-gray-400">
+                        2
+                      </span>
+                      Account{" "}
+                      <span className="hidden sm:inline-flex sm:ml-2">
+                        Info
+                      </span>
+                      <svg
+                        className="w-3 h-3 ml-2 sm:ml-4"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 12 10"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="m7 9 4-4-4-4M1 9l4-4-4-4"
+                        />
+                      </svg>
+                    </li>
+                    <li className="flex items-center">
+                      <span className="flex items-center justify-center w-5 h-5 mr-2 text-xs border border-gray-500 rounded-full shrink-0 dark:border-gray-400">
+                        3
+                      </span>
+                      Review
+                    </li>
+                  </ul>
+                </p>
+
+                <div className="flex items-center justify-between mt-4">
+                  <span className="w-1/5 border-b dark:border-gray-600 lg:w-1/4"></span>
+
+                  <a
+                    href="#"
+                    className="text-xs text-center text-black uppercase dark:text-gray-400 hover:underline"
+                  >
+                Select your Location
+                  </a>
+
+                  <span className="w-1/5 border-b dark:border-gray-400 lg:w-1/4"></span>
+                </div>
+
+                <div className="mt-4 w-full rounded-3xl  ">
+             <Map clicked={click} handlemap={handlemap}/>
+             <div className="flex justify-center">
+             <div 
+             onClick={()=>setclick(!click)}
+             className="bg-violet-500 w-36 rounded-lg text-center">Use My Location</div>
+             </div>
+            
+                </div>
+
+                
+            
+          
+                <div className="mt-6 flex  justify-center">
+                  {" "}
+                  <button
+                    className="  w-full md:w-auto px-6 py-3 text-sm font-medium tracking-wide  capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50 bg-blue-500 text-white ml-6"
+                    onClick={next}
+                  >
+                    NEXT
+                  </button>
+                  <button
+                      className="w-full md:w-auto px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50 btn btn-accent ml-6"
+                      onClick={prev}
+                    >
+                      PREV
+                    </button>
+                </div>
+
+                <div className="flex items-center justify-between mt-4">
+                  <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
+
+                  <a onClick={()=>navigate('/emplogin')}
+                    href="#"
+                    className="text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
+                  >
+                    or sign up
+                  </a>
+
+                  <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
+                </div>
+              </div>
+            )}
+
             {formNo === 1 && (
               <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
                 <div className="flex justify-center mx-auto"></div>
@@ -588,7 +729,7 @@ const Signup = () => {
               </>
             )}
 
-            {formNo === 3 && (
+            {formNo === 4 && (
               <>
                 <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
                   <div className="flex justify-center mx-auto"></div>
@@ -814,4 +955,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default EmployeeSignup;

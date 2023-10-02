@@ -51,11 +51,6 @@ const EmpHome = () => {
           </a>
         </div>
       </nav>
-
-
-
-
-      
     </>
   );
 };

@@ -8,8 +8,12 @@ import {
     getServices,
     getCategory,
     saveaddress,
-    logoutUser
-
+    logoutUser,
+    profileget,
+    profileEdit,
+    addtocart,
+    getcart,
+    deletecart
 
 } from '../controller/userController.js'
 
@@ -23,6 +27,13 @@ router.get('/services/:id',getServices)
 router.get('/categoryname/:id',getCategory)
 router.post('/saveaddress',saveaddress)
 router.post('/logout',logoutUser)
+router.get('/profile/:id',profileget)
+router.post('/profileedit/:id',profileEdit)
+router.post('/cart',addtocart)
+router.get('/cart/:id',getcart)
+router.delete('/cart/:id/:serviceId',deletecart)
+
+
 
 
 

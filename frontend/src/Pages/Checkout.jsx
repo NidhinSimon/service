@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import Modal from "../components/USer/Modal";
 import { input, useSelect } from "@material-tailwind/react";
@@ -7,12 +7,42 @@ import { addToCart, removeFromCart } from "../components/Features/cartSlice";
 import UserNav from "./UserNav";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import DateModal from "../components/USer/DateModal";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const Checkout = () => {
+
+  const [cart,setCart]=useState([])
+  const { userInfo } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/checkout");
+    } else {
+      navigate("/login");
+    }
+  }, [userInfo]);
+
+
+  const userid = userInfo.userExists._id;
+
+  
+  useEffect(() => {
+    const cartfetch = async () => {
+      const res = await axios.get(`http://localhost:5000/users/cart/${userid}`);
+      setCart(res.data);
+      console.log(res);
+    };
+    cartfetch();
+  }, [userid]);
+
   const [mapmodal, setMapmodal] = useState(false);
+  const [datemodal, setdateModal] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const cart = useSelector((state) => state.cart.cart);
+
 
   const handleRemove = (item) => {
     console.log("ivde ethi");
@@ -25,15 +55,30 @@ const Checkout = () => {
     });
   };
 
-  const totalAmount = useSelector((state) => state.cart.totalAmount);
+  // const totalAmount = useSelector((state) => state.cart.totalAmount);
 
   const handleCLose = () => {
     setMapmodal(false);
   };
 
+  const handleDateModal = () => {
+    setdateModal(true);
+  };
+
+  const receive=(data)=>{
+    console.log("ivdeeee",data)
+    toast.success("ivde ethi")
+if(data)
+{
+  toast.success("hello")
+  setdateModal(false)
+}
+  }
+
   return (
     <>
       <UserNav />
+      {datemodal && <DateModal handleclose={receive} />}
       <div className="bg-slate-100  mt-10 h-full w-full p-6 md:flex order-last">
         <div className="bg-slate-100 w-full  md:w-3/5 h-screen p-6 ">
           <div className="bg-white h-4/5 p-5">
@@ -46,7 +91,7 @@ const Checkout = () => {
                   alt="dd"
                 />
               </div>
-              <h1 className="mt-2 ml-2">Send Booking Details To </h1>
+              <h1 className="mt-2 ml-2">Send Booking Details To - </h1>
             </div>
             {/*   address */}
             <div className="bg-blue-100 h-24 w-full mt-5 rounded-lg flex ">
@@ -79,7 +124,10 @@ const Checkout = () => {
               <h1 className="ml-5 text-lg  mt-7">Slot</h1>
 
               <div className="flex justify-center w-full md:mr-16 mt-6">
-                <button className="bg-indigo-600 text-white h-10 w-24 rounded-lg ">
+                <button
+                  onClick={handleDateModal}
+                  className="bg-indigo-600 text-white h-10 w-24 rounded-lg "
+                >
                   Select Slot
                 </button>
               </div>
@@ -108,7 +156,7 @@ const Checkout = () => {
             {cart.map((item) => (
               <>
                 <div className="bg-blue-300 h-20 mt-3  flex  justify-between ">
-                  <p className="mt-4 ml-4">{item.title}</p>
+                  <p className="mt-4 ml-4">{item.name}</p>
                   <p className="mt-4 ml-4">{item.price}</p>
                   <button
                     onClick={() => handleRemove(item)}
@@ -121,7 +169,7 @@ const Checkout = () => {
             ))}
           </div>
           <div className="bg-purple-700 text-white h-10 w-full sticky bottom-0 flex  justify-center ">
-            <h1 className="mt-2 ">PAY - {totalAmount}</h1>
+            {/* <h1 className="mt-2 ">PAY - {totalAmount}</h1> */}
 
             {mapmodal && (
               <>

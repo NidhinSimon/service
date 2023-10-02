@@ -4,6 +4,7 @@ import { generateToken } from "../utils/generateToke.js";
 import Service from "../models/serviceModel.js";
 import Category from '../models/CategoryModel.js'
 
+
 const registerUser = async (req, res) => {
 
   const { name, email, mobile } = req.body
@@ -58,7 +59,7 @@ const loginUser = async (req, res) => {
       console.log("User exists:", userExists);
       res.json({
         message: "User login successful",
-     userExists,
+        userExists,
         token
       });
     } else {
@@ -95,7 +96,7 @@ const saveaddress = async (req, res) => {
 
   try {
     const user = await User.findById(userid);
-    
+
     if (!user) {
       return res.json({ message: "No user exists" });
     }
@@ -116,13 +117,101 @@ const saveaddress = async (req, res) => {
 };
 
 
-const logoutUser=async(req,res)=>{
-  res.cookie('usertoken',"",{
-    httpOnly:true,
-    expires:new Date(0)
+const logoutUser = async (req, res) => {
+  res.cookie('usertoken', "", {
+    httpOnly: true,
+    expires: new Date(0)
   })
-  res.status(200).json({message:"LOGOUT USER"})
+  res.status(200).json({ message: "LOGOUT USER" })
 }
+
+const profileget = async (req, res) => {
+
+  const user = await User.findById(req.params.id)
+
+  res.json(user)
+}
+
+
+const profileEdit = async (req, res) => {
+  console.log(req.params.id, "---------------------------")
+  const { name, email, mobile } = req.body
+
+  try {
+    const updatedService = await User.findByIdAndUpdate(req.params.id, { $set: { name, email, mobile } }, { new: true });
+    res.json(updatedService);
+    console.log(updatedService, ">>>>>>>>>>>>>>>>>>>>>>>>");
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while updating the user.' });
+  }
+
+}
+
+const addtocart = async (req, res) => {
+  try {
+    const { cartData, userid } = req.body;
+    console.log("Received cartData>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:", cartData);
+    console.log("Received userId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<:", userid);
+
+    // Find the user by their ID
+    const user = await User.findById(userid);
+    console.log("Found user:", user);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if the item already exists in the cart
+    const existingCartItemIndex = user.cart.findIndex((item) => item.serviceId === cartData.serviceId);
+
+    if (existingCartItemIndex !== -1) {
+      // If the item already exists, replace it with the new one
+      user.cart[existingCartItemIndex] = cartData;
+    } else {
+      // If the item doesn't exist, add it to the cart
+      user.cart.push(cartData);
+    }
+
+    console.log("Updated user's cart:", user.cart);
+
+    const savedCart = await user.save();
+    console.log(savedCart);
+    res.status(200).json({
+      cart: savedCart.cart,
+      message: "Cart updated successfully"
+    });
+  } catch (error) {
+    console.error("Error updating user's cart:", error);
+    res.status(500).json({ error: "An error occurred while updating the user's cart" });
+  }
+};
+
+
+
+const getcart=async(req,res)=>{
+const userid=req.params.id
+console.log(userid,">>>>>>>>>>")
+const user=await User.findById(userid).select('cart')
+console.log(
+user,">>>>"
+)
+res.json(user.cart)
+
+
+}
+
+const deletecart=async(req,res)=>{
+  const userid=req.params.id
+  const serviceId=req.params.serviceId
+console.log(serviceId,userid)
+  const user=await User.findByIdAndUpdate(userid,{$pull:{cart:{serviceId:serviceId}}},{new:true})
+
+  res.json(user.cart);
+
+
+}
+
 
 
 
@@ -134,6 +223,11 @@ export {
   getServices,
   getCategory,
   saveaddress,
-  logoutUser
+  logoutUser,
+  profileget,
+  addtocart,
+  profileEdit,
+  getcart,
+  deletecart
 
 }

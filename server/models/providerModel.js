@@ -66,8 +66,8 @@ const providerSchema = mongoose.Schema({
     longitude:{
         type:Number
     },
-    latitude:{
-        type:Number
+    address:{
+        type:String
     }
 }, {
     timestamps: true

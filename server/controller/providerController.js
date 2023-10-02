@@ -7,8 +7,8 @@ import User from "../models/userModel.js";
 
 const registerProvider = async (req, res) => {
     console.log("hello provider routes")
-    const { profileimage, name, age, mobile, state, city, license, licenseimage, email, selectedCategory, pincode } = req.body
-
+    const { profileimage, name, age, mobile, state, city, license, licenseimage, email, selectedCategory, pincode,latitude,longitude,address } = req.body
+console.log(req.body,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     try {
 
         const userEmail = await Provider.findOne({ email })
@@ -41,7 +41,10 @@ const registerProvider = async (req, res) => {
                 profileimage: upload.url,
                 email,
                 pincode,
-                category: selectedCategory
+                category: selectedCategory,
+                latitude,
+                longitude,
+                address
             })
             const b = await newProvider.save()
             console.log(b, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
