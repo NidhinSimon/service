@@ -38,7 +38,7 @@ const editableCoupon = async (req, res) => {
     console.log(id, "9999")
     const coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, { new: true })
     await coupon.save()
-
+console.log("hello")
 }
 
 export {
