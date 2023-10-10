@@ -49,7 +49,7 @@ function App() {
 
             <Route path="/*" element={<Navigate to="/login" replace />} />
 
-            {/*Private Route*/}
+  
 
             <Route path="" element={<PrivateRoute />}>
               <Route path="/profile/:id" element={<Profile />} />

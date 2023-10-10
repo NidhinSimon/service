@@ -1,12 +1,7 @@
 import mongoose from "mongoose";
 
-function calculateExpiryDate() {
 
-    const currentDate = new Date();
-    currentDate.setDate(currentDate.getDate() + 30); 
-    return currentDate;
-  }
-  
+
 const couponSchema = mongoose.Schema({
     couponName: {
         type: String,
@@ -19,15 +14,16 @@ const couponSchema = mongoose.Schema({
     },
     expiresIn: {
         type: Date,
-        default:calculateExpiryDate ,
-        required: true
+        required: true,
     },
-    isActive:{
-        type:Boolean,
-        default:true
+    isActive: {
+        type: Boolean,
+        default: true
     }
+},{
+    timestamps:true
 })
 
-const coupon=mongoose.model('coupon',couponSchema)
+const coupon = mongoose.model('coupon', couponSchema)
 export default coupon
 

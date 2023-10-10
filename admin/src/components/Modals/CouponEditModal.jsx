@@ -6,7 +6,7 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { useState } from "react";
 
-const CouponEditModal = ({ id, cancel, confirm }) => {
+const CouponEditModal = ({ id, cancel, confirm ,handle}) => {
   const [hello, sethello] = useState({});
 
 

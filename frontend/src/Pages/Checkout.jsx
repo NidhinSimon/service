@@ -11,11 +11,78 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import DateModal from "../components/USer/DateModal";
 import axios from "axios";
 import toast from "react-hot-toast";
+import Sidebarcoupon from "../components/Sidebar/Sidebar";
+import { Button } from "primereact/button";
+import tr from "date-fns/locale/tr";
 
 const Checkout = () => {
-
-  const [cart,setCart]=useState([])
+  const [sidebar, setsidebar] = useState(false);
+  const [selectedCoupon, setSelectedcoupon] = useState(null);
+  const [cart, setCart] = useState([]);
   const { userInfo } = useSelector((state) => state.user);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [selectedAddress, setSelectedAddress] = useState(null); // Add selectedAddress state
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  useEffect(() => {
+    const storedCoupon = localStorage.getItem("selectedCoupon");
+    if (storedCoupon) {
+      setSelectedcoupon(JSON.parse(storedCoupon));
+    }
+  }, []);
+  const handleCoupon = async () => {
+    setsidebar(true);
+  };
+  const receive = (selectedTime, formattedDate) => {
+    console.log("Selected Time:", selectedTime);
+    console.log("Formatted Date:", formattedDate);
+
+    if (selectedTime && formattedDate) {
+      setSelectedDate(`${formattedDate} ${selectedTime}`);
+    }
+
+    toast.success("Date and time selected successfully.");
+    setdateModal(false);
+  };
+
+  const handleRemove = async (item) => {
+    // dispatch(removeFromCart(item));
+
+    await axios.delete(
+      `http://localhost:5000/users/cart/${userid}/${item.serviceId}`
+    );
+    const updatedcart = cart.filter((i) => i.serviceId !== item.serviceId);
+    setCart(updatedcart);
+    Swal.fire({
+      title: "Item Deleted",
+      text: "Service Removed from the cart",
+      icon: "success",
+    });
+  };
+
+  useEffect(() => {
+    const calculateTotalAmount = () => {
+      let total = 0;
+      cart.forEach((item) => {
+        total += item.price;
+      });
+      return total;
+    };
+
+
+    const total = calculateTotalAmount();
+    setTotalAmount(total);
+  }, [cart]);
+
+
+  const calculateTotalAmount = () => {
+    let total = 0;
+    cart.forEach((item) => {
+      total += item.price;
+    });
+    return total;
+  };
+
 
   useEffect(() => {
     if (userInfo) {
@@ -25,14 +92,38 @@ const Checkout = () => {
     }
   }, [userInfo]);
 
+  const calculateCartTotal = () => {
+    let total = 0;
+    cart.forEach((item) => {
+      total += item.price;
+    });
+    return total;
+  };
+
+  const calculateDiscountedTotal = () => {
+    if (selectedCoupon) {
+      const discount = (selectedCoupon.discount / 100) * calculateCartTotal();
+      return (calculateCartTotal() - discount).toFixed(2);
+    }
+    return calculateCartTotal().toFixed(2);
+  };
+  const closeSidebar = () => {
+    setsidebar(false);
+  };
+  const removeCoupon = () => {
+    setSelectedcoupon(null);
+   
+    localStorage.removeItem("selectedCoupon");
+  };
 
   const userid = userInfo.userExists._id;
 
-  
   useEffect(() => {
     const cartfetch = async () => {
       const res = await axios.get(`http://localhost:5000/users/cart/${userid}`);
       setCart(res.data);
+      const total = calculateTotalAmount();
+      setTotalAmount(total);
       console.log(res);
     };
     cartfetch();
@@ -43,17 +134,16 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // const handleRemove = (item) => {
+  //   console.log("ivde ethi");
+  //   dispatch(removeFromCart(item));
 
-  const handleRemove = (item) => {
-    console.log("ivde ethi");
-    dispatch(removeFromCart(item));
-
-    Swal.fire({
-      title: "Item Deleted",
-      text: "Service Removed from the cart",
-      icon: "success",
-    });
-  };
+  //   Swal.fire({
+  //     title: "Item Deleted",
+  //     text: "Service Removed from the cart",
+  //     icon: "success",
+  //   });
+  // };
 
   // const totalAmount = useSelector((state) => state.cart.totalAmount);
 
@@ -65,15 +155,38 @@ const Checkout = () => {
     setdateModal(true);
   };
 
-  const receive=(data)=>{
-    console.log("ivdeeee",data)
-    toast.success("ivde ethi")
-if(data)
-{
-  toast.success("hello")
-  setdateModal(false)
-}
-  }
+  const handlecheckout = async () => {
+    console.log("DHDGDHDGHGH")
+    console.log(userid,">>")
+    try {
+      const response = await fetch('http://localhost:5000/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: cart, 
+          userId:userid,
+          total: selectedCoupon
+          ? calculateDiscountedTotal()
+          : calculateCartTotal()
+        }),
+      });
+      console.log(response,">>>>")
+  
+      if (response.ok) {
+        const data = await response.json();
+        window.location.href = data.url; // Redirect to the Stripe checkout page
+      } else {
+        // Handle error response from the server
+        console.error('Error:', response.status, response.statusText);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+  
+
 
   return (
     <>
@@ -104,12 +217,18 @@ if(data)
               </div>
               <h1 className="mt-8 ml-5 text-lg font-bold "> Address</h1>
               <div className="flex w-full mt-10    justify-center align-middle ">
-                <button
-                  onClick={() => setMapmodal(true)}
-                  className="bg-indigo-600 text-white rounded-xl h-10 w-32 md:mr-16"
-                >
-                  Select Address
-                </button>
+                {selectedAddress ? (
+                  <p className="text-lg font-bold ml-5">
+                    Selected Address: {selectedAddress}
+                  </p>
+                ) : (
+                  <button
+                    onClick={() => setMapmodal(true)}
+                    className="bg-indigo-600 text-white rounded-xl h-10 w-32 md:mr-16"
+                  >
+                    Select Address
+                  </button>
+                )}
               </div>
             </div>
 
@@ -124,12 +243,16 @@ if(data)
               <h1 className="ml-5 text-lg  mt-7">Slot</h1>
 
               <div className="flex justify-center w-full md:mr-16 mt-6">
-                <button
-                  onClick={handleDateModal}
-                  className="bg-indigo-600 text-white h-10 w-24 rounded-lg "
-                >
-                  Select Slot
-                </button>
+                {selectedDate ? (
+                  <p className="text-lg ml-5">Selected Slot: {selectedDate}</p>
+                ) : (
+                  <button
+                    onClick={handleDateModal}
+                    className="bg-indigo-600 text-white h-10 w-24 rounded-lg "
+                  >
+                    Select Slot
+                  </button>
+                )}
               </div>
             </div>
             <div className="bg-blue-100 h-24 w-full mt-5 rounded-xl border">
@@ -144,7 +267,12 @@ if(data)
                 <h1 className="mt-7  ml-2 text-lg w-32  ">Payment Mode</h1>
               </div>
               <div className="bg-purple-600 rounded-sm flex align-bottom  justify-center h-10 mt-1 w ">
-                <h1 className="text-center mt-2 text-white">Pay 3000</h1>
+                <h1 onClick={handlecheckout} className="text-center mt-2 text-white">
+                  Pay ₹
+                  {selectedCoupon
+                    ? calculateDiscountedTotal()
+                    : calculateCartTotal().toFixed(2)}
+                </h1>
               </div>
             </div>
           </div>
@@ -152,10 +280,18 @@ if(data)
         <div className="bg-slate-100 h-auto w-full -mt-48  md:w-2/5 md:mt-10 p-6 ">
           <div className="bg-slate-100 h-auto border border-slate-300 ">
             <h1 className="text-center mt-2  text-2xl uppercase">cart</h1>
+            {sidebar && (
+              <Sidebarcoupon
+                sidebar={sidebar}
+                selectedCoupon={selectedCoupon}
+                setSelectedcoupon={setSelectedcoupon}
+                closeSidebar={closeSidebar}
+              />
+            )}
 
             {cart.map((item) => (
               <>
-                <div className="bg-blue-300 h-20 mt-3  flex  justify-between ">
+                <div className="bg-blue-300 h-20   flex  justify-between ">
                   <p className="mt-4 ml-4">{item.name}</p>
                   <p className="mt-4 ml-4">{item.price}</p>
                   <button
@@ -167,9 +303,32 @@ if(data)
                 </div>
               </>
             ))}
+            <div className="bg-blue-300 flex justify-center align-middle  overflow-x-hidden ">
+              {selectedCoupon ? (
+                <button
+                  onClick={removeCoupon}
+                  className="ml-4 text-md mb-2 text-orange-500"
+                >
+                  REMOVE X
+                </button>
+              ) : (
+                <Button
+                  className="bg-orange-400 font-semibold uppercase w-full "
+                  onClick={handleCoupon}
+                >
+                  Apply coupon
+                </Button>
+              )}
+            </div>
           </div>
           <div className="bg-purple-700 text-white h-10 w-full sticky bottom-0 flex  justify-center ">
-            {/* <h1 className="mt-2 ">PAY - {totalAmount}</h1> */}
+            <strong>
+              {" "}
+              Total: ₹
+              {selectedCoupon
+                ? calculateDiscountedTotal()
+                : calculateCartTotal().toFixed(2)}
+            </strong>
 
             {mapmodal && (
               <>

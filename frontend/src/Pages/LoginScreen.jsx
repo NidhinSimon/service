@@ -17,8 +17,8 @@ const LoginScreen = () => {
   const [number, setNumber] = useState("");
   const [otp, setOtp] = useState("");
   const [otpPage, setOtpPage] = useState(false);
-  const [otpTimer, setOtpTimer] = useState(60); 
-  const [isResendDisabled, setIsResendDisabled] = useState(true); 
+  const [otpTimer, setOtpTimer] = useState(60);
+  const [isResendDisabled, setIsResendDisabled] = useState(true);
 
   useEffect(() => {
     let timerInterval;
@@ -104,9 +104,9 @@ const LoginScreen = () => {
   };
 
   const handleResendOtp = () => {
-    PhoneVerify(); 
+    PhoneVerify();
     setIsResendDisabled(true);
-    setOtpTimer(60); 
+    setOtpTimer(60);
   };
 
   return (
@@ -122,55 +122,52 @@ const LoginScreen = () => {
                   "url('https://res.cloudinary.com/dj8z6xx94/image/upload/v1694351697/Screenshot_2023-09-10_184145_tx4mgg.png')",
               }}
             ></div>
-   {otpPage ? (
-  <div className="max-w-4xl p-6 mx-auto bg-white rounded-md  dark:bg-slate-200 ">
-    <h1 className="text-black relative left-4 mt-10 text-xl pl-4 ">
-      Enter the OTP sent to your Mobile Number
-    </h1>
-    <h1 className="text-orange-400 relative  top-10 left-28 text-lg">
-      Enter The OTP{" "}
-    </h1>
-    <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-slate-200 my-10  ">
-      <input
-        type="number"
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-        className="ml-20"
-      />
-      
-      
-      
-    </section>
+            {otpPage ? (
+              <div className="max-w-4xl p-6 mx-auto bg-white rounded-md  dark:bg-slate-200 ">
+                <h1 className="text-black relative left-4 mt-10 text-xl pl-4 ">
+                  Enter the OTP sent to your Mobile Number
+                </h1>
+                <h1 className="text-orange-400 relative  top-10 left-28 text-lg">
+                  Enter The OTP{" "}
+                </h1>
+                <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-slate-200 my-10  ">
+                  <input
+                    type="number"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    className="ml-20"
+                  />
+                </section>
 
-    {otpTimer > 0 ? (
-      <>
-        <button
-          className="btn btn-primary relative bottom-34 left-32 text-lg"
-          onClick={OtpVerify}
-        >
-          Verify
-        </button>
-        <div className="text-center mt-2">
-          OTP will expire in {otpTimer} seconds.
-        </div>
-      </>
-    ) : (
-      <div className="text-center mt-2">
-        {isResendDisabled ? (
-          <span className="text-gray-400">Resend OTP</span>
-        ) : (
-          <button
-            className="btn btn-secondary"
-            onClick={handleResendOtp}
-            disabled={isResendDisabled}
-          >
-            Resend OTP
-          </button>
-        )}
-      </div>
-    )}
-  </div>
-) : (
+                {otpTimer > 0 ? (
+                  <>
+                    <button
+                      className="btn btn-primary relative bottom-34 left-32 text-lg"
+                      onClick={OtpVerify}
+                    >
+                      Verify
+                    </button>
+                    <div className="text-center mt-2">
+                      OTP will expire in {otpTimer} seconds.
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center mt-2">
+                    {isResendDisabled ? (
+                      <span className="text-gray-400">Resend OTP</span>
+                    ) : (
+                      <button
+                        className="btn btn-secondary"
+                        onClick={handleResendOtp}
+                        disabled={isResendDisabled}
+                      >
+                        Resend OTP
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
               <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
                 <div className="flex justify-center mx-auto">
                   <img

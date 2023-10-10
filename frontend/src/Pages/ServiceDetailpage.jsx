@@ -3,6 +3,11 @@ import Navbar from "./Navbar";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { button } from "@material-tailwind/react";
+
+import { Sidebar } from "primereact/sidebar";
+
+import { Button } from "primereact/button";
+
 import Cart from "./Cart";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -20,14 +25,33 @@ const ServiceDetail = () => {
   const [services, setServices] = useState([]);
   const [category, setCategory] = useState("");
   const [cart, setCart] = useState([]);
+  const [available, setavailable] = useState([]);
+  const [sidebar, setsidebar] = useState(false);
+  const [selectedCoupon, setSelectedcoupon] = useState(null);
+  const [total, setotal] = useState(0);
 
   const [add] = useAddCartMutation();
 
   const { userInfo } = useSelector((state) => state.user);
 
   const userid = userInfo.userExists._id;
+  useEffect(() => {
+    const storedCoupon = localStorage.getItem("selectedCoupon");
+    if (storedCoupon) {
+      setSelectedcoupon(JSON.parse(storedCoupon));
+    }
+  }, []);
 
   console.log(userid, ">>>>>>>>>>>>>");
+
+  useEffect(() => {
+    const coupon = async () => {
+      const res = await axios.get("http://localhost:5000/admin/getcoupon");
+
+      setavailable(res.data);
+    };
+    coupon();
+  }, []);
 
   useEffect(() => {
     const cartfetch = async () => {
@@ -74,6 +98,10 @@ const ServiceDetail = () => {
     console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>>>");
   };
 
+  const handleCoupon = async () => {
+    setsidebar(true);
+  };
+
   const handleDropdownToggle = () => {
     setIsDropdownVisible(!isDropdownVisible);
   };
@@ -92,9 +120,47 @@ const ServiceDetail = () => {
     });
   };
 
+  const calculateCartTotal = () => {
+    let total = 0;
+    cart.forEach((item) => {
+      total += item.price;
+    });
+    return total;
+  };
+
+  const calculateDiscountedTotal = () => {
+    if (selectedCoupon) {
+      const discount = (selectedCoupon.discount / 100) * calculateCartTotal();
+      return (calculateCartTotal() - discount).toFixed(2);
+    }
+    return calculateCartTotal().toFixed(2);
+  };
+  const closeSidebar = () => {
+    setsidebar(false);
+  };
+
+  const removeCoupon = () => {
+    setSelectedcoupon(null);
+    // Remove the selected coupon from local storage
+    localStorage.removeItem("selectedCoupon");
+  };
+
+  const handleCheckout = () => {
+    const checkoutData = {
+      total: selectedCoupon
+        ? calculateDiscountedTotal()
+        : calculateCartTotal().toFixed(2),
+      cart,
+      appliedCoupon: selectedCoupon,
+    };
+  
+    navigate("/checkout", { state: checkoutData });
+  };
+  
   return (
     <>
       <UserNav />
+
       <div className="">
         <div className="bg-slate-100  h-screen w-full">
           <div className="bg-gradient-to-tl from-blue-200 to-blue-400  border drop-shadow  w-full h-48">
@@ -256,12 +322,37 @@ const ServiceDetail = () => {
                               </button>
                             </div>
                           ))}
+                          <div>
+                            <Button onClick={handleCoupon}>
+                              Apply coupoondd
+                            </Button>
+                            {sidebar && (
+                              <Sidebarcoupon
+                                sidebar={sidebar}
+                                selectedCoupon={selectedCoupon}
+                                setSelectedcoupon={setSelectedcoupon}
+                                closeSidebar={closeSidebar}
+                              />
+                            )}
+                            {selectedCoupon && (
+                              <button
+                                onClick={removeCoupon}
+                                className="ml-4 text-2xl mb-2 text-orange-500"
+                              >
+                                X
+                              </button>
+                            )}
+                          </div>
+
                           <div className="bg-indigo-500 text-white rounded-lg h-10 flex justify-between mt-2 ">
-                            {/* <p className="ml-3 mt-1">₹{totalAmount}</p> */}
-                            <button
-                              onClick={() => navigate("/checkout")}
-                              className="mr-3"
-                            >
+                            <p className="ml-3 mt-1">
+                              Total: $
+                              {selectedCoupon
+                                ? calculateDiscountedTotal()
+                                : calculateCartTotal().toFixed(2)}
+                            </p>
+
+                            <button onClick={handleCheckout} className="mr-3">
                               View Checkout
                             </button>
                           </div>

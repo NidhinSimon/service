@@ -85,7 +85,7 @@ const verifyProvider = async (req, res) => {
     }
 }
 
-
+ 
 function sendOtpVerify(email) {
     const transporter = nodemailer.createTransport({
         service: 'Gmail',
