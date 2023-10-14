@@ -31,6 +31,8 @@ import Spinner from "./components/Employee/Spinner";
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import EmployeeSignup from "./components/Employee/EmployeeSignup";
+import Success from "./Pages/Success";
+import Notfound from "./Pages/Notfound";
 
 function App() {
   return (
@@ -47,7 +49,10 @@ function App() {
             <Route path="/i" element={<Final />} />
             <Route path="/emplogin" element={<Login />} />
 
-            <Route path="/*" element={<Navigate to="/login" replace />} />
+            <Route path="/notfound" element={<Notfound/>}></Route>
+
+            <Route path="/*" element={<Navigate to="/notfound" replace />} />
+            <Route path="/success" element={<Success/>}></Route>
 
   
 

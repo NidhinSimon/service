@@ -21,22 +21,20 @@ const userSchema = mongoose.Schema({
         type: Boolean,
         default: false
     },
-    address: {
-        type: Array,
-    },
-    longitude: {
-        type: Number,
-    },
-    latitude: {
-        type: Number,
-    },
+    addresses: [
+        {
+            address: String,
+            longitude: Number,
+            latitude: Number
+        }
+    ],
     cart: [
         {
             serviceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Service', required: true },
             quantity: { type: Number, required: true, default: 1 },
             name: { type: String, required: true },
             price: { type: Number, required: true },
-            _id:false
+            _id: false
         },
     ],
 

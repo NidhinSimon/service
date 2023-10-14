@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import BlockModal from "./Modals/BlockModal";
 import { Empty } from "antd";
 
-const PAGE_SIZE = 1; 
+const PAGE_SIZE = 1;
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -88,13 +88,11 @@ const AllUsers = () => {
     setModal(false);
   };
 
-  
   const filteredUsers = users.filter(
     (user) =>
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
 
   const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
   const startIndex = (currentPage - 1) * PAGE_SIZE;
@@ -140,48 +138,45 @@ const AllUsers = () => {
               </tr>
             </thead>
             <tbody>
-              {displayedUsers.length===0 ? (
+              {displayedUsers.length === 0 ? (
                 <>
-                <div className=" flex justify-center">
-                <Empty />  
-                </div>
-           
+                  <div className=" flex justify-center">
+                    <Empty />
+                  </div>
                 </>
-             ):(
-              <>
-               {displayedUsers.map((user) => (
-                  <tr
-                    key={user._id}
-                    className="border-b hover:bg-gray-100 dark:hover:bg-slate-200-800"
-                  >
-                    <td className="px-6 py-4 font-medium whitespace-nowrap">
-                      {user.name}
-                    </td>
-                    <td className="px-6 py-4">{user.email}</td>
-                    <td className="px-6 py-4">{user.mobile}</td>
-                    <td className="px-6 py-4">
-                      {user.blocked ? (
-                        <button
-                          className="text-green-500 font-medium hover:underline"
-                          onClick={() => handleUnblock(user._id)}
-                        >
-                          UNBLOCK
-                        </button>
-                      ) : (
-                        <button
-                          className="text-red-600 font-medium hover:underline"
-                          onClick={() => handleClick(user._id)}
-                        >
-                          BLOCK
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </>
-               
+              ) : (
+                <>
+                  {displayedUsers.map((user) => (
+                    <tr
+                      key={user._id}
+                      className="border-b hover:bg-gray-100 dark:hover:bg-slate-200-800"
+                    >
+                      <td className="px-6 py-4 font-medium whitespace-nowrap">
+                        {user.name}
+                      </td>
+                      <td className="px-6 py-4">{user.email}</td>
+                      <td className="px-6 py-4">{user.mobile}</td>
+                      <td className="px-6 py-4">
+                        {user.blocked ? (
+                          <button
+                            className="text-green-500 font-medium hover:underline"
+                            onClick={() => handleUnblock(user._id)}
+                          >
+                            UNBLOCK
+                          </button>
+                        ) : (
+                          <button
+                            className="text-red-600 font-medium hover:underline"
+                            onClick={() => handleClick(user._id)}
+                          >
+                            BLOCK
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </>
               )}
-          
             </tbody>
           </table>
         </div>

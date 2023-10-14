@@ -10,14 +10,15 @@ import Spinner from "../Employee/Spinner";
 mapboxgl.accessToken =
   "pk.eyJ1IjoibmlkaGluc2ltb24iLCJhIjoiY2xtcnRnMXRuMDl6djJrcW05b2EzZHk3dSJ9.mBz6318PCWKLjMF-TxK-IQ";
 
-const Modal = ({ closemodal }) => {
+const Modal = ({ closemodal ,handlelocation}) => {
   const [map, setMap] = useState(null);
   const [userLocationMarker, setUserLocationMarker] = useState(null);
   const [address, setAddress] = useState("");
   const [longitude, setLongitude] = useState("");
   const [latitude, setLatitude] = useState("");
-  const [isLoadingMap, setIsLoadingMap] = useState(true); // Track map loading
-  const [isLoadingSelectAddress, setIsLoadingSelectAddress] = useState(false); // Track select address loading
+  const [isLoadingMap, setIsLoadingMap] = useState(true); 
+  const [isLoadingSelectAddress, setIsLoadingSelectAddress] = useState(false); 
+  
 
   const { userInfo } = useSelector((state) => state.user);
   const userid = userInfo.userExists._id;
@@ -32,7 +33,7 @@ const Modal = ({ closemodal }) => {
       return;
     }
 
-    setIsLoadingSelectAddress(true); // Set loading state
+    setIsLoadingSelectAddress(true);
 
     const res = await axios.post("http://localhost:5000/users/saveaddress", {
       userid,
@@ -40,6 +41,7 @@ const Modal = ({ closemodal }) => {
       longitude,
       latitude,
     });
+    handlelocation({address,longitude,latitude})
 
     setIsLoadingSelectAddress(false); 
 

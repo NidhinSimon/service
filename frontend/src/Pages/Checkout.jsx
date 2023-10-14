@@ -23,6 +23,8 @@ const Checkout = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [selectedAddress, setSelectedAddress] = useState(null); // Add selectedAddress state
   const [selectedDate, setSelectedDate] = useState(null);
+  const [latitude, setlatitude] = useState("");
+  const [longitude, setlongitude] = useState("");
 
   useEffect(() => {
     const storedCoupon = localStorage.getItem("selectedCoupon");
@@ -69,11 +71,9 @@ const Checkout = () => {
       return total;
     };
 
-
     const total = calculateTotalAmount();
     setTotalAmount(total);
   }, [cart]);
-
 
   const calculateTotalAmount = () => {
     let total = 0;
@@ -82,7 +82,6 @@ const Checkout = () => {
     });
     return total;
   };
-
 
   useEffect(() => {
     if (userInfo) {
@@ -112,7 +111,7 @@ const Checkout = () => {
   };
   const removeCoupon = () => {
     setSelectedcoupon(null);
-   
+
     localStorage.removeItem("selectedCoupon");
   };
 
@@ -156,37 +155,38 @@ const Checkout = () => {
   };
 
   const handlecheckout = async () => {
-    console.log("DHDGDHDGHGH")
-    console.log(userid,">>")
-    try {
-      const response = await fetch('http://localhost:5000/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          items: cart, 
-          userId:userid,
-          total: selectedCoupon
-          ? calculateDiscountedTotal()
-          : calculateCartTotal()
-        }),
-      });
-      console.log(response,">>>>")
-  
-      if (response.ok) {
-        const data = await response.json();
-        window.location.href = data.url; // Redirect to the Stripe checkout page
-      } else {
-        // Handle error response from the server
-        console.error('Error:', response.status, response.statusText);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-  
+    console.log("DHDGDHDGHGH");
+    console.log(userid,selectedDate,selectedAddress, latitude,longitude,">>");
 
+    await axios
+      .post("http://localhost:5000/checkout", {
+        userId: userid,
+        cart,
+        total: selectedCoupon
+          ? calculateDiscountedTotal()
+          : calculateCartTotal(),
+        date:selectedDate,
+        address:selectedAddress,
+        latitude:latitude,
+        longitude:longitude,
+      })
+      .then((res) => {
+        if (res.data.url) {
+          window.location.href = res.data.url;
+        }
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const handlelocation = async (data) => {
+    console.log(data);
+    setMapmodal(false);
+    setSelectedAddress(data.address);
+    setlatitude(data.latitude);
+    setlongitude(data.longitude);
+  };
 
   return (
     <>
@@ -267,7 +267,10 @@ const Checkout = () => {
                 <h1 className="mt-7  ml-2 text-lg w-32  ">Payment Mode</h1>
               </div>
               <div className="bg-purple-600 rounded-sm flex align-bottom  justify-center h-10 mt-1 w ">
-                <h1 onClick={handlecheckout} className="text-center mt-2 text-white">
+                <h1
+                  onClick={handlecheckout}
+                  className="text-center mt-2 text-white"
+                >
                   Pay ₹
                   {selectedCoupon
                     ? calculateDiscountedTotal()
@@ -332,7 +335,10 @@ const Checkout = () => {
 
             {mapmodal && (
               <>
-                <Modal closemodal={handleCLose} />
+                <Modal
+                  closemodal={handleCLose}
+                  handlelocation={handlelocation}
+                />
               </>
             )}
           </div>

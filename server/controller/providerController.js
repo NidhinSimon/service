@@ -7,29 +7,20 @@ import User from "../models/userModel.js";
 
 const registerProvider = async (req, res) => {
     console.log("hello provider routes")
-    const { profileimage, name, age, mobile, state, city, license, licenseimage, email, selectedCategory, pincode,latitude,longitude,address } = req.body
-console.log(req.body,">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    const { profileimage, name, age, mobile, state, city, license, licenseimage, email, selectedCategory, pincode, latitude, longitude, address } = req.body
+    console.log(req.body, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     try {
-
         const userEmail = await Provider.findOne({ email })
-
         if (userEmail) {
             res.json({ message: "User Exist with the same email" })
         }
-
-
         const userMobile = await Provider.findOne({ mobile })
-
         if (userMobile) {
             res.json({ message: "User with the same mobile exist" })
         }
-
         const uploadimage = await cloudinary.v2.uploader.upload(licenseimage)
-
         if (profileimage) {
-
             const upload = await cloudinary.v2.uploader.upload(profileimage)
-
             const newProvider = new Provider({
                 name,
                 age,
@@ -85,7 +76,7 @@ const verifyProvider = async (req, res) => {
     }
 }
 
- 
+
 function sendOtpVerify(email) {
     const transporter = nodemailer.createTransport({
         service: 'Gmail',
@@ -128,23 +119,21 @@ const rejectProvider = async (req, res) => {
 
 const loginProvider = async (req, res) => {
     const { mobile } = req.body;
-  
+
     try {
-        const provider=await User.findOne({mobile})
-        if(provider)
-        {
-            res.json({message:"User Login Successfull"})
-        }else
-        {
-            res.json({message:"User does not exist"})
+        const provider = await User.findOne({ mobile })
+        if (provider) {
+            res.json({ message: "User Login Successfull" })
+        } else {
+            res.json({ message: "User does not exist" })
         }
     }
     catch (error) {
         console.log(error.message)
     }
-        
-  };
-  
+
+};
+
 
 
 const allProviders = async (req, res) => {
@@ -187,27 +176,27 @@ const unblock = async (req, res) => {
     res.json({ message: "user blocked sucessfully" })
 }
 
-const checkprovider=async(req,res)=>{
-    const {mobile}=req.body
+const checkprovider = async (req, res) => {
+    const { mobile } = req.body
 
-    
+
     try {
         const provider = await Provider.findOne({ mobile });
-       
+
         if (provider) {
-          if (provider.status === 'pending') {
-            res.json({ message: 'provider verify pending', status: 'pending' });
-          } else if (provider.status === 'rejected') {
-            res.json({ message: 'provider verify rejected', status: 'rejected' });
-          } else {
-            res.json({ message: 'provider veirfy verified', status: 'verified' });
-          }
+            if (provider.status === 'pending') {
+                res.json({ message: 'provider verify pending', status: 'pending' });
+            } else if (provider.status === 'rejected') {
+                res.json({ message: 'provider verify rejected', status: 'rejected' });
+            } else {
+                res.json({ message: 'provider veirfy verified', status: 'verified' });
+            }
         } else {
-          res.json({ message: 'provider  does not exist' });
+            res.json({ message: 'provider  does not exist' });
         }
-      } catch (error) {
+    } catch (error) {
         console.log(error.message);
-      }
+    }
 
 }
 

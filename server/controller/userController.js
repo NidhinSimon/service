@@ -92,7 +92,6 @@ const getCategory = async (req, res) => {
 
 const saveaddress = async (req, res) => {
   const { address, userid, latitude, longitude } = req.body;
-  console.log(req.body, "??????????????????????????????????????");
 
   try {
     const user = await User.findById(userid);
@@ -101,7 +100,7 @@ const saveaddress = async (req, res) => {
       return res.json({ message: "No user exists" });
     }
 
-    user.address.addToSet({
+    user.addresses.push({
       address,
       latitude,
       longitude,
