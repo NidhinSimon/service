@@ -37,7 +37,23 @@ const booking = new mongoose.Schema({
     },
     longitude: {
         type: Number
-    }
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'accepted', 'rejected'],
+        default: 'pending',
+      },
+      provider: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Provider',
+        default: null, // Initially, no provider is assigned
+      },
+      providersReceived: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Provider'
+        }
+    ]
 
 }, {
     timestamps: true

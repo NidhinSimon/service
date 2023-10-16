@@ -3,7 +3,7 @@ import express from 'express'
 
 
 
-import { registerProvider,getProviders,verifyProvider, rejectProvider, loginProvider,allProviders,providerBlock, unblock,checkprovider} from '../controller/providerController.js'
+import { registerProvider,getProviders,verifyProvider, rejectProvider, loginProvider,allProviders,providerBlock, unblock,checkprovider,getrequest} from '../controller/providerController.js'
 
 
 
@@ -22,5 +22,6 @@ serviceRoute.get('/allproviders',allProviders)
 serviceRoute.put('/block/:id',providerBlock)
 serviceRoute.put('/unblock/:id',unblock)
 serviceRoute.post('/checkprovider',checkprovider)
+serviceRoute.post('/provider/requests',getrequest)
 
 export default  serviceRoute

@@ -10,6 +10,10 @@ import { auth } from "../firebase.config";
 import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
 import Spinner from "./Spinner";
+
+import { useSelector, useDispatch } from "react-redux";
+import { setProviderInfo } from "../../slices/employeeSlice";
+
 const Login = () => {
   const navigate = useNavigate();
   const [otpPage, setOtppage] = useState(false);
@@ -20,6 +24,7 @@ const Login = () => {
   const [showrejectedModal, setShowrejectedModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const dispatch = useDispatch();
   const onCaptchVerify = () => {
     const auth = getAuth();
     window.recaptchaVerifier = new RecaptchaVerifier(
@@ -103,8 +108,9 @@ const Login = () => {
       const res = await axios.post("http://localhost:5000/providerlogin", {
         mobile,
       });
-      console.log(res, "???????????????????????????????/");
-
+      console.log(res,"............")
+    
+      dispatch(setProviderInfo(res.data));
       if (res.data.message === "User Login Successfull") {
         setOtppage(true);
 

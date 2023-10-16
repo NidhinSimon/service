@@ -15,6 +15,9 @@ import Service from './models/serviceModel.js';
 import category from './models/CategoryModel.js';
 import Provider from './models/providerModel.js';
 import geolib from 'geolib'
+import Request from './models/RequestModel.js';
+
+
 dotenv.config();
 
 connectDB();
@@ -28,7 +31,11 @@ const app = express();
 // app.use(express.json());
 
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
+
+
 app.use(cors());
+
+
 app.use(cookieParser());
 
 app.use(express.json({
@@ -49,7 +56,9 @@ app.use('/users', userRoutes);
 app.use('/admin', adminRoute);
 app.use(serviceRoute);
 
-const createOrder = async (customer, data) => {
+let session
+
+const createOrder = async (customer, data, io, res, session) => {
   const items = JSON.parse(customer.metadata.cart);
 
   try {
@@ -57,16 +66,29 @@ const createOrder = async (customer, data) => {
       userId: customer.metadata.userId,
       paymentId: data.payment_intent,
       services: items,
-      Total: data.amount_total,
+      Total: customer.metadata.total,
       payment_status: data.payment_status,
       address: customer.metadata.address,
       date: customer.metadata.date,
       latitude: customer.metadata.latitude,
       longitude: customer.metadata.longitude,
     });
-
+    newOrder.status = 'pending'
     const newBooking = await newOrder.save();
-    console.log(newBooking, "Booking saved successfully.");
+
+
+    const newRequest = new Request({
+      booking: newBooking._id, // Save the booking ID in the request model
+      // Other request data
+    });
+    
+    const savedRequest = await newRequest.save();
+    
+ 
+
+
+
+
 
     // Extract the serviceId from the booking
     const serviceId = items[0].serviceId;
@@ -93,7 +115,7 @@ const createOrder = async (customer, data) => {
         longitude: provider.longitude,
       };
       const distance = geolib.getDistance(userLocation, providerLocation);
-      console.log(distance,"-------------------------------------------------------------------------------------------------------------------")
+      console.log(distance, "-------------------------------------------------------------------------------------------------------------------")
       return { ...provider._doc, distance };
     });
 
@@ -102,46 +124,58 @@ const createOrder = async (customer, data) => {
 
     // Filter providers based on a maximum distance (e.g., 10000 meters)
     const maxDistance = 300000; // Adjust as needed
-    const nearbyProviders = providersWithDistances.filter(provider => provider.distance <= maxDistance);
+    const nearbyProviders = providersWithDistances.filter(
+      (provider) =>
+        provider.distance <= maxDistance &&
+        !savedRequest.providersReceived.includes(provider._id)
+    );
+    savedRequest.providersReceived.push(...nearbyProviders.map((p) => p._id));
+    const b = await savedRequest.save();
 
-    console.log('Nearby Providers:', nearbyProviders);
+
+
+    nearbyProviders.forEach((provider) => {
+      console.log("===================================================================================================================")
+      io.emit('new-request', { request: savedRequest });
+
+    });
+    
+
+
+
+
   } catch (error) {
-    console.log(error.message, "An error occurred.");
+    console.log(error.message, "An error occurred. in create order");
   }
 };
+
 
 
 app.post('/checkout', async (req, res) => {
   console.log('inside checkout route');
 
-  console.log(req.body, "----------------------------req.body-----------------------------")
+ 
 
   const total = parseInt(req.body.total, 10);
 
   if (isNaN(total)) {
-    res.status(400).json({ error: 'Invalid total amount' });
-    return;
+    return res.status(400).json({ error: 'Invalid total amount' });
   }
 
   try {
-
     const customer = await stripe.customers.create({
-
       metadata: {
-
         userId: req.body.userId,
         cart: JSON.stringify(req.body.cart),
         date: req.body.date,
         address: req.body.address,
-        latitude:req.body.latitude,
-        longitude:req.body.longitude
-
-
-
+        latitude: req.body.latitude,
+        longitude: req.body.longitude,
+        total: total
       },
     });
 
-    const session = await stripe.checkout.sessions.create({
+    session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
       customer: customer.id,
@@ -164,16 +198,17 @@ app.post('/checkout', async (req, res) => {
     res.json({ url: session.url });
   } catch (error) {
     console.error(error.message);
-    res.status(500).json({ error: 'An error occurred' });
+    res.status(500).json({ error: 'An error occurred......' });
   }
 });
 
+
 const endpointSecret = "whsec_895129302214904687488a5d9440622b6146a5307d8735ad6c4327ebbaf7b34f";
 
-app.post('/webhook', express.raw({ type: 'application/json' }), async (req, response) => {
+app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
 
   const sig = req.headers['stripe-signature'];
-  console.log('Raw Request Body:', req.rawBody);
+
   try {
 
     const event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
@@ -183,18 +218,17 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, resp
 
     if (eventType === 'checkout.session.completed') {
       stripe.customers.retrieve(data.customer).then((customer) => {
-        console.log(customer, "-----------------------------------------------------------------------customerrrr------------------------------------------------------------------------------------------------------")
-        console.log(data, "==========================================================================data=========================================================================")
-        createOrder(customer, data)
+      
+        createOrder(customer, data, io, res)
       }).catch((err) => {
-        console.log(err.message);
+        console.log(err.message, "______________-");
       });
     }
 
-    response.send().end();
+    res.send().end();
   } catch (err) {
     console.log('Webhook Error:', err.message);
-    response.status(400).send(`Webhook Error: ${err.message}`);
+    res.status(400).send(`Webhook Error: ${err.message}`);
   }
 });
 
@@ -215,9 +249,14 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log('connect to socket.io');
+  console.log('Client connected:', socket.id);
+
+
+  socket.emit('test-message', 'This is a test message from the server.');
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected:', socket.id);
+  });
 });
 
-io.on("connection", (socket) => {
-  socket.emit("hello", "77777777777777777777777");
-});
+

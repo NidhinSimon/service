@@ -128,7 +128,7 @@ const RegisterScree = () => {
 
 
   const OtpVerify=(e)=>{
-   
+   console.log(otp)
 
     window.confirmationResult.confirm(otp).then(async(res)=>{
       console.log(res,"resultttt")

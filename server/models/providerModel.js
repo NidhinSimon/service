@@ -71,6 +71,9 @@ const providerSchema = mongoose.Schema({
     },
     address:{
         type:String
+    },
+    socketId:{
+        type:String
     }
 }, {
     timestamps: true

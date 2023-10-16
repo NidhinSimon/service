@@ -2,6 +2,8 @@ import Provider from "../models/providerModel.js";
 import cloudinary from 'cloudinary'
 import nodemailer from 'nodemailer';
 import User from "../models/userModel.js";
+import Request from "../models/RequestModel.js";
+import Booking from "../models/BookingModel.js";
 
 
 
@@ -121,9 +123,10 @@ const loginProvider = async (req, res) => {
     const { mobile } = req.body;
 
     try {
-        const provider = await User.findOne({ mobile })
+        const provider = await Provider.findOne({ mobile })
         if (provider) {
-            res.json({ message: "User Login Successfull" })
+            res.json({ message: "User Login Successfull",provider })
+        
         } else {
             res.json({ message: "User does not exist" })
         }
@@ -200,6 +203,25 @@ const checkprovider = async (req, res) => {
 
 }
 
+
+
+const getrequest=async(req,res)=>{
+    try {
+console.log("booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",req.body)
+        const bookingId = req.body.bookingId.booking;
+        console.log(bookingId,"***********************************************************************************************************")
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+          return res.status(404).json({ message: 'Booking not found' });
+        }
+        console.log(booking,'///////////////////////////')
+        res.status(200).json(booking);
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+      }
+}
+
 export {
     registerProvider,
     getProviders,
@@ -210,5 +232,5 @@ export {
     providerBlock,
     unblock,
     checkprovider
-
+,getrequest
 }
