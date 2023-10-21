@@ -33,6 +33,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import EmployeeSignup from "./components/Employee/EmployeeSignup";
 import Success from "./Pages/Success";
 import Notfound from "./Pages/Notfound";
+import Bookings from "./components/Employee/Bookings";
+import UpcomingBookings from "./components/Employee/UpcomingBookings";
+import AllBookings from "./components/Employee/AllBookings";
 
 function App() {
   return (
@@ -53,7 +56,11 @@ function App() {
 
             <Route path="/*" element={<Navigate to="/notfound" replace />} />
             <Route path="/success" element={<Success/>}></Route>
+            <Route path="/provider/upcoming" element={<UpcomingBookings/>}/>
+            <Route path="/provider/all" element={<AllBookings/>}/>
 
+            <Route path="/empbookings" element={<Bookings />} />
+           
   
 
             <Route path="" element={<PrivateRoute />}>

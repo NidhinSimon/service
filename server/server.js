@@ -16,18 +16,55 @@ import category from './models/CategoryModel.js';
 import Provider from './models/providerModel.js';
 import geolib from 'geolib'
 import Request from './models/RequestModel.js';
+import { acceptBooking } from './controller/providerController.js';
+import { init } from './controller/providerController.js';
 
+
+const port = process.env.PORT;
 
 dotenv.config();
 
 connectDB();
 
-const port = process.env.PORT;
+
+const app = express();
+
+const server = app.listen(port, () => {
+  console.log(`server started on http://localhost:${port}`);
+});
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000",
+  }
+});
+
+io.on("connection", (socket) => {
+
+  socket.join(`provider_${socket.id}`);
+
+  socket.on('test-message', (data) => {
+    console.log('Received test message from client:', data);
+    socket.emit('test-message-response', 'Message received on the server');
+
+  });
+  socket.on('join-provider-room', (providerId) => {
+    socket.join(`provider_${providerId}`);
+  });
+
+  socket.emit('test','message ddddddddddddddddddddrrrrrrrrrrrrrsent to the user sideeeeeeeeeeeeeeeeeeeeee')
 
 
+  socket.on('disconnect', () => {
+  });
+});
+
+
+
+init(io)
 
 const stripe = new Stripe(process.env.SECRET_STRIPE_KEY);
-const app = express();
+
 // app.use(express.json());
 
 app.use(express.urlencoded({ extended: true, limit: "500mb" }));
@@ -56,107 +93,16 @@ app.use('/users', userRoutes);
 app.use('/admin', adminRoute);
 app.use(serviceRoute);
 
-let session
 
-const createOrder = async (customer, data, io, res, session) => {
-  const items = JSON.parse(customer.metadata.cart);
-
-  try {
-    const newOrder = new Booking({
-      userId: customer.metadata.userId,
-      paymentId: data.payment_intent,
-      services: items,
-      Total: customer.metadata.total,
-      payment_status: data.payment_status,
-      address: customer.metadata.address,
-      date: customer.metadata.date,
-      latitude: customer.metadata.latitude,
-      longitude: customer.metadata.longitude,
-    });
-    newOrder.status = 'pending'
-    const newBooking = await newOrder.save();
-
-
-    const newRequest = new Request({
-      booking: newBooking._id, // Save the booking ID in the request model
-      // Other request data
-    });
-    
-    const savedRequest = await newRequest.save();
-    
- 
-
-
-
-
-
-    // Extract the serviceId from the booking
-    const serviceId = items[0].serviceId;
-
-    // Retrieve the associated service
-    const service = await Service.findById(serviceId);
-
-    // Extract the category information from the service
-    const category = service.category;
-
-    // Find providers in the same category
-    const providersInCategory = await Provider.find({ category });
-
-    // Define the user's location
-    const userLocation = {
-      latitude: customer.metadata.latitude, // Replace with user's latitude
-      longitude: customer.metadata.longitude, // Replace with user's longitude
-    };
-
-    // Calculate distances and filter providers
-    const providersWithDistances = providersInCategory.map(provider => {
-      const providerLocation = {
-        latitude: provider.latitude,
-        longitude: provider.longitude,
-      };
-      const distance = geolib.getDistance(userLocation, providerLocation);
-      console.log(distance, "-------------------------------------------------------------------------------------------------------------------")
-      return { ...provider._doc, distance };
-    });
-
-    // Sort providers by distance in ascending order
-    providersWithDistances.sort((a, b) => a.distance - b.distance);
-
-    // Filter providers based on a maximum distance (e.g., 10000 meters)
-    const maxDistance = 300000; // Adjust as needed
-    const nearbyProviders = providersWithDistances.filter(
-      (provider) =>
-        provider.distance <= maxDistance &&
-        !savedRequest.providersReceived.includes(provider._id)
-    );
-    savedRequest.providersReceived.push(...nearbyProviders.map((p) => p._id));
-    const b = await savedRequest.save();
-
-
-
-    nearbyProviders.forEach((provider) => {
-      console.log("===================================================================================================================")
-      io.emit('new-request', { request: savedRequest });
-
-    });
-    
-
-
-
-
-  } catch (error) {
-    console.log(error.message, "An error occurred. in create order");
-  }
-};
 
 
 
 app.post('/checkout', async (req, res) => {
   console.log('inside checkout route');
 
- 
 
-  const total = parseInt(req.body.total, 10);
+
+  const total = req.body.total
 
   if (isNaN(total)) {
     return res.status(400).json({ error: 'Invalid total amount' });
@@ -218,7 +164,7 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
     if (eventType === 'checkout.session.completed') {
       stripe.customers.retrieve(data.customer).then((customer) => {
-      
+
         createOrder(customer, data, io, res)
       }).catch((err) => {
         console.log(err.message, "______________-");
@@ -234,29 +180,151 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
 
 
+let session
+
+
+const createOrder = async (customer, data, io, res, session) => {
+  if (customer && customer.metadata && customer.metadata.cart) {
+    try {
+      const items = JSON.parse(customer.metadata.cart);
+
+      const newOrder = new Booking({
+        bookingId: data._id,
+        userId: customer.metadata.userId,
+        paymentId: data.payment_intent,
+        services: items,
+        Total: customer.metadata.total,
+        payment_status: data.payment_status,
+        address: customer.metadata.address,
+        date: customer.metadata.date,
+        latitude: customer.metadata.latitude,
+        longitude: customer.metadata.longitude,
+      });
+
+      newOrder.status = 'pending';
+      const newBooking = await newOrder.save();
+      console.log(newBooking, '.....')
+      const serviceId = items[0].serviceId;
+
+      const service = await Service.findById(serviceId);
+
+      const category = service.category;
+
+      const providersInCategory = await Provider.find({ category });
+
+      const userLocation = {
+        latitude: customer.metadata.latitude,
+        longitude: customer.metadata.longitude,
+      };
+
+      const providersWithDistances = providersInCategory.map((provider) => {
+        const providerLocation = {
+          latitude: provider.latitude,
+          longitude: provider.longitude,
+        };
+        const distance = geolib.getDistance(userLocation, providerLocation);
+        console.log(distance, "-------------------------------------------------------------------------------------------------------------------");
+        return { ...provider._doc, distance };
+      });
+
+      providersWithDistances.sort((a, b) => a.distance - b.distance);
+
+      const maxDistance = 300000; //30km
+
+      const nearbyProviders = providersWithDistances.filter(
+        (provider) => provider.distance <= maxDistance
+      );
+
+      console.log(newBooking, "Booking created");
+
+      nearbyProviders.forEach((provider) => {
+        io.to(`provider_${provider._id}`).emit('new-booking-for-provider', { booking: newBooking });
+      });
+
+      console.log('Booking notifications sent to nearby providers');
+    } catch (error) {
+      console.log(error.message, "An error occurred in create order");
+    }
+  } else {
+    console.log('Error: customer.metadata.cart is undefined or null');
+  }
+};
+
+
+
+
+
+
+
+
+
+// const sendNotification = async (newBooking, items,io,customer) => {
+
+//   try {
+
+//     const serviceId = items[0].serviceId;
+
+
+//     const service = await Service.findById(serviceId);
+
+//     const category = service.category;
+
+//     const providersInCategory = await Provider.find({ category });
+
+
+//     const userLocation = {
+//       latitude: customer.metadata.latitude,
+//       longitude: customer.metadata.longitude,
+//     };
+
+
+//     const providersWithDistances = providersInCategory.map((provider) => {
+//       const providerLocation = {
+//         latitude: provider.latitude,
+//         longitude: provider.longitude,
+//       };
+//       const distance = geolib.getDistance(userLocation, providerLocation);
+//       console.log(distance, "-------------------------------------------------------------------------------------------------------------------");
+//       return { ...provider._doc, distance };
+//     });
+
+
+//     providersWithDistances.sort((a, b) => a.distance - b.distance);
+
+
+//     const maxDistance = 300000; //30km
+
+//     const nearbyProviders = providersWithDistances.filter(
+//       (provider) => provider.distance <= maxDistance
+//     );
+
+//     console.log(newBooking, "Booking created");
+
+//     nearbyProviders.forEach((provider) => {
+
+//       io.to(`provider_${provider._id}`).emit('new-booking-for-provider', { booking: newBooking });
+//     });
+
+//     console.log('Booking notifications sent to nearby providers');
+
+//   } catch (error) {
+//     console.log(error.message, "error in the sendNotification")
+//   }
+
+
+// }
+
+
+
+
+
+
+
+
+
 app.use('/', (req, res) => {
   res.json({ message: 'server ready' });
 });
 
-const server = app.listen(port, () => {
-  console.log(`server started on http://localhost:${port}`);
-});
-
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:3000",
-  }
-});
-
-io.on("connection", (socket) => {
-  console.log('Client connected:', socket.id);
-
-
-  socket.emit('test-message', 'This is a test message from the server.');
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected:', socket.id);
-  });
-});
 
 

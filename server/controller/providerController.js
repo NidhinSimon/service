@@ -6,6 +6,12 @@ import Request from "../models/RequestModel.js";
 import Booking from "../models/BookingModel.js";
 
 
+let io;
+
+
+const init = (hello) => {
+    io = hello;
+  };
 
 const registerProvider = async (req, res) => {
     console.log("hello provider routes")
@@ -205,24 +211,67 @@ const checkprovider = async (req, res) => {
 
 
 
-const getrequest=async(req,res)=>{
+const getrequest = async (req, res) => {
     try {
-console.log("booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo",req.body)
-        const bookingId = req.body.bookingId.booking;
-        console.log(bookingId,"***********************************************************************************************************")
-        const booking = await Booking.findById(bookingId);
-        if (!booking) {
-          return res.status(404).json({ message: 'Booking not found' });
-        }
-        console.log(booking,'///////////////////////////')
-        res.status(200).json(booking);
-      } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Internal Server Error' });
+      console.log("booooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo", req.body);
+      const bookingId = req.body.bookingId.booking;
+      console.log(bookingId, "***********************************************************************************************************");
+      const booking = await Booking.findById(bookingId);
+      if (!booking) {
+        return res.status(404).json({ message: 'Booking not found' });
       }
-}
+      console.log(booking, '///////////////////////////');
+      res.status(200).json(booking);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  }
+  
 
+
+  const acceptBooking = async (req, res) => {
+    console.log('LLL')
+    const { id } = req.params;
+    const { providerId } = req.body;
+  
+    console.log("Booking ID:", id);
+    console.log("Provider ID:", providerId);
+  
+    try {
+      const booking = await Booking.findById(id);
+  
+      if (!booking) {
+        return res.status(404).json({ success: false, message: 'Booking not found' });
+      }
+  
+      if (booking.status === 'accepted') {
+      return res.status(400).json({ success: false, message: 'Booking is already accepted' });
+      }
+  
+      booking.status = 'accepted';
+      booking.provider = providerId;
+   await booking.save();
+      const provider=await Provider.findById(providerId)
+
+  
+     
+     io.emit('booking-accepted', { booking: booking ,  providerInfo: {
+        name: provider.name,
+        age: provider.age,
+        mobile: provider.mobile,
+      
+      }});
+
+     res.json({ success: true, updatedBooking:booking });
+    } catch (error) {
+      console.error('Error accepting booking:', error);
+      return res.status(500).json({ success: false, message: 'Error accepting booking' });
+    }
+  };
+  
 export {
+    init,
     registerProvider,
     getProviders,
     verifyProvider,
@@ -232,5 +281,6 @@ export {
     providerBlock,
     unblock,
     checkprovider
-,getrequest
+,getrequest,
+acceptBooking
 }

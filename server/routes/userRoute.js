@@ -13,7 +13,8 @@ import {
     profileEdit,
     addtocart,
     getcart,
-    deletecart
+    deletecart,
+    getBookings
 
 } from '../controller/userController.js'
 
@@ -32,6 +33,7 @@ router.post('/profileedit/:id',profileEdit)
 router.post('/cart',addtocart)
 router.get('/cart/:id',getcart)
 router.delete('/cart/:id/:serviceId',deletecart)
+router.post('/getbookings/:id',getBookings)
 
 
 

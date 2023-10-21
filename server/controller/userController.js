@@ -3,6 +3,8 @@ import User from "../models/userModel.js";
 import { generateToken } from "../utils/generateToke.js";
 import Service from "../models/serviceModel.js";
 import Category from '../models/CategoryModel.js'
+import Booking from "../models/BookingModel.js";
+import Provider from "../models/providerModel.js";
 
 
 const registerUser = async (req, res) => {
@@ -211,6 +213,48 @@ console.log(serviceId,userid)
 
 }
 
+const getBookings = async (req, res) => {
+  console.log("ISISYISUIUSISUISUISUISUISUSIUSIUSIUISUISUISUISUISUSIUSIUSIUSIUISUSIUISUSIUSIUSI")
+  const { id } = req.params;
+  try {
+    const userbookings = await Booking.find({ userId: id });
+    console.log(userbookings,"odiododuodudodu")
+
+    if (!userbookings || userbookings.length === 0) {
+      return res.status(404).json({ message: "No bookings found" });
+    }
+
+    let providerInfo = null;
+
+    for (const booking of userbookings) {
+      if (booking.provider) {
+        const provider = await Provider.findById(booking.provider);
+        if (provider) {
+          providerInfo = {
+            name: provider.name,
+            age: provider.age,
+            mobile: provider.mobile,
+           
+          };
+          break; 
+        }
+      }
+    }
+    console.log(providerInfo,"diyidydiydiydiydiyd")
+
+    if (!providerInfo) {
+      return res.status(404).json({ success: false, message: "Provider not found" });
+    }
+
+    res.json({ success: true, providerInfo });
+  } catch (error) {
+    console.error("Error fetching bookings and provider:", error);
+    return res.status(500).json({ success: false, message: "Error fetching bookings and provider" });
+  }
+};
+
+
+
 
 
 
@@ -227,6 +271,7 @@ export {
   addtocart,
   profileEdit,
   getcart,
-  deletecart
+  deletecart,
+  getBookings
 
 }

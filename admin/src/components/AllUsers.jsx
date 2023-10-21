@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import BlockModal from "./Modals/BlockModal";
 import { Empty } from "antd";
 
-const PAGE_SIZE = 1;
+const PAGE_SIZE = 3;
 
 const AllUsers = () => {
   const [users, setUsers] = useState([]);
@@ -140,7 +140,7 @@ const AllUsers = () => {
             <tbody>
               {displayedUsers.length === 0 ? (
                 <>
-                  <div className=" flex justify-center">
+                  <div className="flex justify-center">
                     <Empty />
                   </div>
                 </>

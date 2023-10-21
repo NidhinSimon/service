@@ -8,11 +8,10 @@ import { useNavigate } from "react-router-dom";
 import Map from "./Map";
 
 const EmployeeSignup = () => {
+  const [click, setclick] = useState(false);
 
-  const [click, setclick] = useState(false)
-
-  const navigate=useNavigate()
-  const formArray = [1, 2, 3,4];
+  const navigate = useNavigate();
+  const formArray = [1, 2, 3, 4];
   const [formNo, setFormNo] = useState(formArray[0]);
   const [previewImage, setPreviewImage] = useState(null);
   const [profilepreview, setprofilepreview] = useState(null);
@@ -24,9 +23,9 @@ const EmployeeSignup = () => {
 
   const [category, setCategories] = useState([]);
 
-  const [longitude,setLongitude]=useState('')
-const [latitude,setLatitude]=useState('')
-const [address,setAddress]=useState('')
+  const [longitude, setLongitude] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [address, setAddress] = useState("");
 
   const validationSchema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -111,9 +110,9 @@ const [address,setAddress]=useState('')
           ...value,
           licenseimage: licenseimage,
           profileimage: profileimage,
-          longitude:longitude,
-          latitude:latitude,
-          address:address
+          longitude: longitude,
+          latitude: latitude,
+          address: address,
         });
         if (res.data.message === "provider added successfully") {
           toast.success("Data sent");
@@ -131,19 +130,15 @@ const [address,setAddress]=useState('')
 
   const closeModal = () => {
     setVerify(false);
-    navigate('/login')
+    navigate("/login");
   };
 
-
-
-  const handlemap=async(longitude,latitude,address)=>{
-    setLatitude(latitude)
-setLongitude(longitude)
-setAddress(address)
-console.log(address,latitude,longitude)
-
-
-  }
+  const handlemap = async (longitude, latitude, address) => {
+    setLatitude(latitude);
+    setLongitude(longitude);
+    setAddress(address);
+    console.log(address, latitude, longitude);
+  };
 
   return (
     <>
@@ -160,7 +155,7 @@ console.log(address,latitude,longitude)
                   "url('https://res.cloudinary.com/dj8z6xx94/image/upload/v1694407836/Screenshot_2023-09-11_101521_s0wmfr.png')",
               }}
             ></div>
- {formNo === 3 && (
+            {formNo === 3 && (
               <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">
                 <div className="flex justify-center mx-auto"></div>
 
@@ -230,25 +225,24 @@ console.log(address,latitude,longitude)
                     href="#"
                     className="text-xs text-center text-black uppercase dark:text-gray-400 hover:underline"
                   >
-                Select your Location
+                    Select your Location
                   </a>
 
                   <span className="w-1/5 border-b dark:border-gray-400 lg:w-1/4"></span>
                 </div>
 
                 <div className="mt-4 w-full rounded-3xl  ">
-             <Map clicked={click} handlemap={handlemap}/>
-             <div className="flex justify-center">
-             <div 
-             onClick={()=>setclick(!click)}
-             className="bg-violet-500 w-36 rounded-lg text-center">Use My Location</div>
-             </div>
-            
+                  <Map clicked={click} handlemap={handlemap} />
+                  <div className="flex justify-center">
+                    <div
+                      onClick={() => setclick(!click)}
+                      className="bg-violet-500 w-36 rounded-lg text-center"
+                    >
+                      Use My Location
+                    </div>
+                  </div>
                 </div>
 
-                
-            
-          
                 <div className="mt-6 flex  justify-center">
                   {" "}
                   <button
@@ -258,17 +252,18 @@ console.log(address,latitude,longitude)
                     NEXT
                   </button>
                   <button
-                      className="w-full md:w-auto px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50 btn btn-accent ml-6"
-                      onClick={prev}
-                    >
-                      PREV
-                    </button>
+                    className="w-full md:w-auto px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50 btn btn-accent ml-6"
+                    onClick={prev}
+                  >
+                    PREV
+                  </button>
                 </div>
 
                 <div className="flex items-center justify-between mt-4">
                   <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
 
-                  <a onClick={()=>navigate('/emplogin')}
+                  <a
+                    onClick={() => navigate("/emplogin")}
                     href="#"
                     className="text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
                   >
@@ -494,7 +489,8 @@ console.log(address,latitude,longitude)
                 <div className="flex items-center justify-between mt-4">
                   <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
 
-                  <a onClick={()=>navigate('/emplogin')}
+                  <a
+                    onClick={() => navigate("/emplogin")}
                     href="#"
                     className="text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
                   >
@@ -716,7 +712,8 @@ console.log(address,latitude,longitude)
                   <div className="flex items-center justify-between mt-4">
                     <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
 
-                    <a onClick={()=>navigate('/emplogin')}
+                    <a
+                      onClick={() => navigate("/emplogin")}
                       href="#"
                       className="text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
                     >
@@ -936,7 +933,8 @@ console.log(address,latitude,longitude)
                   <div className="flex items-center justify-between mt-4">
                     <span className="w-1/5 border-b dark:border-gray-600 md:w-1/4"></span>
 
-                    <a onClick={()=>navigate('/emplogin')}
+                    <a
+                      onClick={() => navigate("/emplogin")}
                       href="#"
                       className="text-xs text-gray-500 uppercase dark:text-gray-400 hover:underline"
                     >

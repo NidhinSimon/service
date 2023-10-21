@@ -9,8 +9,10 @@ import toast, { Toaster } from "react-hot-toast";
 import CouponEditModal from "../Modals/CouponEditModal";
 
 
-function formatExpiresIn(days) {
-  return `${days} day${days === 1 ? "" : "s"}`;
+
+function formatDate(dateString) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(dateString).toLocaleDateString(undefined, options);
 }
 
 const CouponList = () => {
@@ -119,7 +121,7 @@ const CouponList = () => {
                     {i.couponName}
                   </th>
                   <td className="px-6 py-4">{i.discount}</td>
-                  <td className="px-6 py-4">{formatExpiresIn(i.expiresIn)}</td>
+                  <td className="px-6 py-4">{formatDate(i.expiresIn)}</td>
                   <td className="px-6 py-4">
                     <button
                       onClick={() => handleEdit(i._id)}

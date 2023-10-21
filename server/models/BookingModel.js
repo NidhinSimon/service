@@ -46,7 +46,12 @@ const booking = new mongoose.Schema({
       provider: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Provider',
-        default: null, // Initially, no provider is assigned
+        default: null
+      },
+      workStatus: {
+        type: String,
+        enum: ['pending', 'completed'],
+        default: 'pending',
       },
       providersReceived: [
         {
