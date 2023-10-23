@@ -1,114 +1,86 @@
 import React, { useEffect, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
 import io from 'socket.io-client';
-import axios from 'axios';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import Navbar from './Navbar';
 
 const Success = () => {
-  const [longitude, setLongitude] = useState(null);
-  const [latitude, setLatitude] = useState(null);
-  const [providerInfo, setProviderInfo] = useState("");
+  const [providerInfo, setProviderInfo] = useState(null); // State to hold provider information
+  const [loading, setLoading] = useState(true);
 
   const socket = io("http://localhost:5000");
 
   const { userInfo } = useSelector((state) => state.user);
-
   const userId = userInfo.userExists._id;
-
-  const navigate=useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     let providerInfoTimeout;
 
-    // Clear provider info after 3 minutes (3 * 60 * 1000 milliseconds)
     const clearProviderInfo = () => {
       localStorage.removeItem('providerInfo');
-      setProviderInfo("");
-      navigate('/home')
-      
-      // Navigate to the home page or your orders page here
-      // Example: window.location.href = '/home';
+      setProviderInfo(null); 
+      navigate('/home');
     };
 
     const handleBookingAccepted = (data) => {
-      const bookingId = data.booking._id;
-      console.log(bookingId, "..");
-      localStorage.setItem('bookingId', bookingId);
-
+      console.log(data,'&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&')
       const receivedProviderInfo = data.providerInfo;
-      console.log(receivedProviderInfo, "Provider info received");
-      setProviderInfo(receivedProviderInfo);
-      localStorage.setItem('providerInfo', JSON.stringify(receivedProviderInfo));
 
-      // Set a timeout to clear provider info after 3 minutes
-      providerInfoTimeout = setTimeout(clearProviderInfo, 3 * 60 * 1000);
+
+      setProviderInfo(receivedProviderInfo);
+
+      
+      clearTimeout(providerInfoTimeout);
     };
 
     socket.on('booking-accepted', handleBookingAccepted);
 
-    mapboxgl.accessToken = "pk.eyJ1IjoibmlkaGluc2ltb24iLCJhIjoiY2xtcnRnMXRuMDl6djJrcW05b2EzZHk3dSJ9.mBz6318PCWKLjMF-TxK-IQ";
-
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setLongitude(position.coords.longitude);
-        setLatitude(position.coords.latitude);
-
-        const map = new mapboxgl.Map({
-          container: 'map-container',
-          style: 'mapbox://styles/mapbox/streets-v11',
-          center: [longitude, latitude],
-          zoom: 12,
-        });
-
-        return () => {
-          map.remove();
-          // Clear the providerInfoTimeout when unmounting the component
-          clearTimeout(providerInfoTimeout);
-        };
-      });
-
-      const storedProviderInfo = localStorage.getItem('providerInfo');
-      if (storedProviderInfo) {
-        setProviderInfo(JSON.parse(storedProviderInfo));
-      }
-    }
+   
+    const loadingTimeout = setTimeout(() => {
+      setLoading(false);
+    }, 9000); 
 
     return () => {
-      // Clear the providerInfoTimeout when unmounting the component
+      // Clear the providerInfoTimeout and loadingTimeout when unmounting the component
       clearTimeout(providerInfoTimeout);
+      clearTimeout(loadingTimeout);
     };
-  }, [longitude, latitude]);
-
-
-  // const fetchBooking=async(bookingId)=>{
-  //   console.log(bookingId,"...")
-  //   const res=await axios.post(`http://localhost:5000/users/getbookings/${userId}`,{bookingId})
-  //   console.log(res,'POPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPOPO')
-  //   setProviderInfo(res.data.providerInfo)
-  // }
+  }, []);
 
   return (
-    <div className="flex justify-center items-center h-screen relative">
-      <div id="map-container" className="absolute top-0 left-0 w-full flex justify-center h-5/6"></div>
-
-      <div className="bg-slate-300 w-72 sm:w-96 h-48 rounded-xl flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 z-10">
-        <span className="loading loading-spinner text-success"></span>
-        <h1 className="text-center text-lg sm:text-xl md:text-xl lg:text-xl">
-          We are searching for Providers. Please be patient.
-        </h1>
-      
-        {providerInfo && (
-          <div>
-            <div className="profile-info">
-              <img src={""} alt="Provider" />
-              <h1>{providerInfo.name}</h1>
-              <p>Phone: {providerInfo.mobile}</p>
-            </div>
+    <>
+    <Navbar/>
+   
+    <div className="flex justify-center items-center h-screen">
+      {loading ? ( // Initial loading state
+        <div className="bg-slate-300 w-72 sm:w-96 h-48 rounded-xl flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 z-10">
+          <span className="loading loading-spinner text-success"></span>
+          <h1 className="text-center text-lg sm:text-xl md:text-xl lg:text-xl">
+            Searching for Providers. Please wait.
+          </h1>
+        </div>
+      ) : providerInfo ? ( // Provider found state
+        <div className="bg-blue-200 w-72 sm:w-96 rounded-xl p-4 sm:p-6 lg:p-8 z-10 ">
+          <h1 className="text-center text-lg sm:text-xl md:text-xl lg:text-xl">
+            YAY ! WE FOUND YOU OUR BEST EMPLOYEEE
+          </h1>
+          <div className="profile-info">
+            {/* <img src={providerInfo.profileImage} alt="Provider" className="rounded-full h-16 w-16" /> */}
+            <h1 className="text-lg font-semibold">{providerInfo.name}</h1>
+            <p>Phone: {providerInfo.mobile}</p>
+           <p>Age:{providerInfo.age}</p>
           </div>
-        )}
-      </div>
+        </div>
+      ) : ( // No provider found state
+        <div className="bg-slate-300 w-72 sm:w-96 h-48 rounded-xl flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 z-10">
+          <h1 className="text-center text-lg sm:text-xl md:text-xl lg:text-xl">
+            No Providers Found. Please try again later.
+          </h1>
+        </div>
+      )}
     </div>
+    </>
   );
 };
 

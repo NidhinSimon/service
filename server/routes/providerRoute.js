@@ -3,7 +3,7 @@ import express from 'express'
 
 
 
-import { registerProvider, getProviders, verifyProvider, rejectProvider, loginProvider, allProviders, providerBlock, unblock, checkprovider, getrequest, acceptBooking } from '../controller/providerController.js'
+import { registerProvider, getProviders, verifyProvider, rejectProvider, loginProvider, allProviders,serviceName, providerBlock, unblock, checkprovider, getrequest, acceptBooking,getUpcoming ,getAllBookings,cancelBooking} from '../controller/providerController.js'
 
 
 const serviceRoute = express.Router()
@@ -22,5 +22,9 @@ serviceRoute.put('/unblock/:id', unblock)
 serviceRoute.post('/checkprovider', checkprovider)
 serviceRoute.post('/provider/requests', getrequest)
 serviceRoute.put('/boookings/accept/:id', acceptBooking)
+serviceRoute.get('/upcoming/:id',getUpcoming)
+serviceRoute.get('/allbookings/:id',getAllBookings)
+serviceRoute.post('/cancel/:id',cancelBooking)
+serviceRoute.get('/servicename/:id',serviceName)
 
 export default serviceRoute

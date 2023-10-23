@@ -14,9 +14,12 @@ import {
     addtocart,
     getcart,
     deletecart,
-    getBookings
+    getBookings,
+    userBookings,
+    canceluser
 
 } from '../controller/userController.js'
+import { cancelBooking } from '../controller/providerController.js'
 
 
 router.post('/register',registerUser)
@@ -34,7 +37,8 @@ router.post('/cart',addtocart)
 router.get('/cart/:id',getcart)
 router.delete('/cart/:id/:serviceId',deletecart)
 router.post('/getbookings/:id',getBookings)
-
+router.get('/bookings/:id',userBookings)
+router.post('/canceluser/:id',canceluser)
 
 
 

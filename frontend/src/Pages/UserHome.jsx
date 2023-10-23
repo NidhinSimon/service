@@ -38,9 +38,9 @@ const UserHome = () => {
       <header className="bg-white rounded-3xl">
       <UserNav/>
 
-        <div className="container px-6 py-16 mx-auto ">
+        <div className="container px-6 py-16 mx-auto h-screen ">
           <div className="items-center lg:flex">
-            <div className="w-full lg:w-1/2 lg:relative bottom-20  ">
+            <div className="w-full lg:w-1/2  lg:relative bottom-20  ">
               <div className="lg:max-w-lg">
                 <h1 className="text-3xl font-semibold text-gray-800 dark:text-white lg:text-4xl">
                   Best place to Book <br /> your{" "}

@@ -10,10 +10,10 @@ import Swal from "sweetalert2";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import DateModal from "../components/USer/DateModal";
 import axios from "axios";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import Sidebarcoupon from "../components/Sidebar/Sidebar";
 import { Button } from "primereact/button";
-import tr from "date-fns/locale/tr";
+import { FaTrash } from "react-icons/fa";
 
 const Checkout = () => {
   const [sidebar, setsidebar] = useState(false);
@@ -111,7 +111,11 @@ const Checkout = () => {
   };
   const removeCoupon = () => {
     setSelectedcoupon(null);
-
+    toast((t) => (
+      <span>
+        <b> Coupon Removed 😞 </b>
+      </span>
+    ));
     localStorage.removeItem("selectedCoupon");
   };
 
@@ -156,7 +160,14 @@ const Checkout = () => {
 
   const handlecheckout = async () => {
     console.log("DHDGDHDGHGH");
-    console.log(userid,selectedDate,selectedAddress, latitude,longitude,">>");
+    console.log(
+      userid,
+      selectedDate,
+      selectedAddress,
+      latitude,
+      longitude,
+      ">>"
+    );
 
     await axios
       .post("http://localhost:5000/checkout", {
@@ -165,10 +176,10 @@ const Checkout = () => {
         total: selectedCoupon
           ? calculateDiscountedTotal()
           : calculateCartTotal(),
-        date:selectedDate,
-        address:selectedAddress,
-        latitude:latitude,
-        longitude:longitude,
+        date: selectedDate,
+        address: selectedAddress,
+        latitude: latitude,
+        longitude: longitude,
       })
       .then((res) => {
         if (res.data.url) {
@@ -190,6 +201,7 @@ const Checkout = () => {
 
   return (
     <>
+      <Toaster />
       <UserNav />
       {datemodal && <DateModal handleclose={receive} />}
       <div className="bg-slate-100  mt-10 h-full w-full p-6 md:flex order-last">
@@ -306,18 +318,21 @@ const Checkout = () => {
                 </div>
               </>
             ))}
-            <div className="bg-blue-300 flex justify-center align-middle  overflow-x-hidden ">
+            <div className="bg-blue-300 flex justify-center  align-middle  overflow-x-hidden ">
               {selectedCoupon ? (
                 <button
                   onClick={removeCoupon}
-                  className="ml-4 text-md mb-2 text-orange-500"
+                  className="ml-4 text-md mb-2 font-semibold w-96 text-indigo-500 "
                 >
-                  REMOVE X
+                  <h1 className="">
+                    Coupon Applied-{selectedCoupon?.discount}%OFF{" "}
+                  </h1>
+                  <b className="text-red-600">Remove </b>
                 </button>
               ) : (
                 <Button
-                  className="bg-orange-400 font-semibold uppercase w-full "
-                  onClick={handleCoupon}
+                  className="bg-orange-400 font-semibold uppercase w-full"
+                  onClick={() => setsidebar(true)} // Open the sidebar
                 >
                   Apply coupon
                 </Button>

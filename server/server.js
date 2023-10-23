@@ -18,6 +18,8 @@ import geolib from 'geolib'
 import Request from './models/RequestModel.js';
 import { acceptBooking } from './controller/providerController.js';
 import { init } from './controller/providerController.js';
+import cron from 'node-cron'
+import User from './models/userModel.js';
 
 
 const port = process.env.PORT;
@@ -100,7 +102,7 @@ app.use(serviceRoute);
 app.post('/checkout', async (req, res) => {
   console.log('inside checkout route');
 
-
+console.log(req.body,"?????/")
 
   const total = req.body.total
 
@@ -188,11 +190,14 @@ const createOrder = async (customer, data, io, res, session) => {
     try {
       const items = JSON.parse(customer.metadata.cart);
 
+      
+
       const newOrder = new Booking({
         bookingId: data._id,
         userId: customer.metadata.userId,
         paymentId: data.payment_intent,
         services: items,
+   
         Total: customer.metadata.total,
         payment_status: data.payment_status,
         address: customer.metadata.address,
@@ -240,6 +245,29 @@ const createOrder = async (customer, data, io, res, session) => {
       nearbyProviders.forEach((provider) => {
         io.to(`provider_${provider._id}`).emit('new-booking-for-provider', { booking: newBooking });
       });
+      cron.schedule('*/2 * * * *', async () => {
+        const currentTime = Date.now();
+        const timeThreshold = 2 * 60 * 1000; 
+      
+        const unacceptedBookings = await Booking.find({
+          status: 'pending',
+          createdAt: { $lt: new Date(currentTime - timeThreshold) },
+        });
+
+        for (const booking of unacceptedBookings) {
+        const refund=booking.Total
+        console.log(refund,'>>>>>>')
+
+
+          console.log("inside cron")
+          booking.status='canceled'
+          const canceledBooking = await booking.save();
+          await updateUserwallet(booking.userId,refund)
+          console.log(canceledBooking,'>>>>>>>>>>>>>>>>>>>>>>')
+          io.emit('cancel-booking', { bookingId: canceledBooking._id });
+          
+        }
+      })
 
       console.log('Booking notifications sent to nearby providers');
     } catch (error) {
@@ -249,6 +277,21 @@ const createOrder = async (customer, data, io, res, session) => {
     console.log('Error: customer.metadata.cart is undefined or null');
   }
 };
+
+const updateUserwallet=async(userId,refund)=>
+{
+  console.log('ssusususususuysuysuysuysuysuysuys')
+try {
+  const user=await User.findById(userId)
+  user.Wallet+=refund
+
+  await user.save()
+  console.log(`User ${user._id}'s wallet balance updated: $${user.Wallet}`);
+
+} catch (error) {
+  console.log(error.message)
+}
+}
 
 
 

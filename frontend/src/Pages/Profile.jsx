@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import ProfileModal from "../components/USer/ProfileModal";
+import { FaRupeeSign } from "react-icons/fa";
 
 const Profile = () => {
   const [profile, setProfile] = useState([]);
@@ -35,10 +36,19 @@ const Profile = () => {
               src={profile.profileimage}
               alt="Profile"
             />
-            <div className="mt-4 md:mt-0 md:ml-10">
+            <div className="mt-4 md:mt-0 md:ml-10 w-3/5">
               <button type="" className="btn btn-primary w-full md:w-44">
                 Upload New Photo
               </button>
+            </div>
+            <div className=" w-2/5 h-full flex justify-center items-center">
+            <h1 className="text-lg font-semibold flex items-center">
+                <FaRupeeSign className="mr-2" /> Wallet Balance:
+                <span className="text-indigo-600 ml-1">
+                  {profile.Wallet}
+                </span>
+              </h1>
+
             </div>
           </div>
           <div className="bg-slate-200 h-36 w-full md:h-80 rounded-3xl mt-5">

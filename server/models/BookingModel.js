@@ -16,10 +16,14 @@ const booking = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Service'
             },
-         
+
 
         }
     ],
+    serviceName: {
+        type: String,
+
+    },
     date: {
         type: String
     },
@@ -31,7 +35,7 @@ const booking = new mongoose.Schema({
     },
     payment_status: {
         type: String
-    }, 
+    },
     latitude: {
         type: Number
     },
@@ -40,20 +44,20 @@ const booking = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'accepted', 'rejected'],
+        enum: ['pending', 'accepted', 'rejected', 'canceled'],
         default: 'pending',
-      },
-      provider: {
+    },
+    provider: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Provider',
         default: null
-      },
-      workStatus: {
+    },
+    workStatus: {
         type: String,
         enum: ['pending', 'completed'],
         default: 'pending',
-      },
-      providersReceived: [
+    },
+    providersReceived: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Provider'

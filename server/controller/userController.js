@@ -190,23 +190,23 @@ const addtocart = async (req, res) => {
 
 
 
-const getcart=async(req,res)=>{
-const userid=req.params.id
-console.log(userid,">>>>>>>>>>")
-const user=await User.findById(userid).select('cart')
-console.log(
-user,">>>>"
-)
-res.json(user.cart)
+const getcart = async (req, res) => {
+  const userid = req.params.id
+  console.log(userid, ">>>>>>>>>>")
+  const user = await User.findById(userid).select('cart')
+  console.log(
+    user, ">>>>"
+  )
+  res.json(user.cart)
 
 
 }
 
-const deletecart=async(req,res)=>{
-  const userid=req.params.id
-  const serviceId=req.params.serviceId
-console.log(serviceId,userid)
-  const user=await User.findByIdAndUpdate(userid,{$pull:{cart:{serviceId:serviceId}}},{new:true})
+const deletecart = async (req, res) => {
+  const userid = req.params.id
+  const serviceId = req.params.serviceId
+  console.log(serviceId, userid)
+  const user = await User.findByIdAndUpdate(userid, { $pull: { cart: { serviceId: serviceId } } }, { new: true })
 
   res.json(user.cart);
 
@@ -218,7 +218,7 @@ const getBookings = async (req, res) => {
   const { id } = req.params;
   try {
     const userbookings = await Booking.find({ userId: id });
-    console.log(userbookings,"odiododuodudodu")
+    console.log(userbookings, "odiododuodudodu")
 
     if (!userbookings || userbookings.length === 0) {
       return res.status(404).json({ message: "No bookings found" });
@@ -234,13 +234,13 @@ const getBookings = async (req, res) => {
             name: provider.name,
             age: provider.age,
             mobile: provider.mobile,
-           
+
           };
-          break; 
+          break;
         }
       }
     }
-    console.log(providerInfo,"diyidydiydiydiydiyd")
+    console.log(providerInfo, "diyidydiydiydiydiyd")
 
     if (!providerInfo) {
       return res.status(404).json({ success: false, message: "Provider not found" });
@@ -256,8 +256,33 @@ const getBookings = async (req, res) => {
 
 
 
+const userBookings = async (req, res) => {
+  const { id } = req.params
+  console.log("id", id)
+
+  const userBoooking = await Booking.find({ userId: id })
+
+  console.log(userBoooking, "......")
+  res.json(userBoooking)
+}
 
 
+const canceluser = async (req, res) => {
+  const { id } = req.params
+
+  const booking = await Booking.findById(id)
+
+  booking.status = 'canceled'
+
+  await booking.save()
+  const userId = booking.userId
+  const user = await User.findById(userId)
+
+  user.Wallet += booking.Total
+
+
+  await user.save()
+}
 
 export {
   registerUser,
@@ -272,6 +297,8 @@ export {
   profileEdit,
   getcart,
   deletecart,
-  getBookings
+  getBookings,
+  userBookings,
+  canceluser
 
 }

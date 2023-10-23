@@ -1,20 +1,49 @@
-.spinner-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-    backdrop-filter: blur(5px); 
-  }
-  
-  .loading-container {
-    text-align: center;
-    background-color: transparent;
-    border-radius: 8px;
-    box-shadow: none;
-  }
+/* spinner.css */
+/* spinner.css */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Use the viewport height for full-screen centering */
+  background: rgba(46, 46, 46, 0.8); /* Semi-transparent background for blur effect */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 999; /* Make sure the spinner is on top of other content */
+  backdrop-filter: blur(60px); /* Apply the blur effect to the background */
+}
+
+/* Rest of your existing CSS */
+
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 50px;
+  aspect-ratio: 1.154;
+  position: relative;
+  background: conic-gradient(from 120deg at 50% 64%,#0000, #1e5fea 1deg 120deg,#0000 121deg);
+  animation: l27-0 1.5s infinite cubic-bezier(0.3,1,0,1);
+}
+.loader:before,
+.loader:after {
+  content:'';
+  position: absolute;
+  inset:0;
+  background:inherit;
+  transform-origin: 50% 66%;
+  animation: l27-1 1.5s infinite;
+}
+.loader:after {
+  --s:-1;
+}
+@keyframes l27-0 {
+   0%,30%      {transform: rotate(0)}
+   70%         {transform: rotate(120deg)}
+   70.01%,100% {transform: rotate(360deg)}
+}
+@keyframes l27-1 {
+   0%      {transform: rotate(calc(var(--s,1)*120deg)) translate(0)}
+   30%,70% {transform: rotate(calc(var(--s,1)*120deg)) translate(calc(var(--s,1)*-5px),10px)}
+   100%    {transform: rotate(calc(var(--s,1)*120deg)) translate(0)}
+}
