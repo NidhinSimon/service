@@ -89,6 +89,14 @@ const UpcomingBookings = () => {
                     <p className="text-sm text-gray-500">
                       <strong>User:</strong> {booking.username}
                     </p>
+                    {booking.serviceName.map((service, index) => (
+  <p key={index} className="text-xl font-semibold text-indigo-600">
+    
+    {service}
+  </p>
+))}
+                   
+                   
                   </div>
                   <button
                     onClick={() => handleCancel(booking._id)}

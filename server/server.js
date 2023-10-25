@@ -53,8 +53,9 @@ io.on("connection", (socket) => {
   socket.on('join-provider-room', (providerId) => {
     socket.join(`provider_${providerId}`);
   });
+  
 
-  socket.emit('test','message ddddddddddddddddddddrrrrrrrrrrrrrsent to the user sideeeeeeeeeeeeeeeeeeeeee')
+  socket.emit('test', 'message ddddddddddddddddddddrrrrrrrrrrrrrsent to the user sideeeeeeeeeeeeeeeeeeeeee')
 
 
   socket.on('disconnect', () => {
@@ -80,7 +81,7 @@ app.use(cookieParser());
 app.use(express.json({
   verify: (req, res, buf) => {
     req.rawBody = buf
-  }
+  },
 }))
 
 
@@ -102,8 +103,7 @@ app.use(serviceRoute);
 app.post('/checkout', async (req, res) => {
   console.log('inside checkout route');
 
-console.log(req.body,"?????/")
-
+console.log(req.body,"______------->>>>>>>>>")
   const total = req.body.total
 
   if (isNaN(total)) {
@@ -119,9 +119,12 @@ console.log(req.body,"?????/")
         address: req.body.address,
         latitude: req.body.latitude,
         longitude: req.body.longitude,
-        total: total
+        total: total,
+        name: req.body.name
       },
     });
+
+    
 
     session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -190,14 +193,16 @@ const createOrder = async (customer, data, io, res, session) => {
     try {
       const items = JSON.parse(customer.metadata.cart);
 
-      
+      const serviceNames = items.map(item => item.name);
 
+console.log(serviceNames,"~~~~~~~~~~~~~~~~~~~~~~~~~~~~+==============================================~~~")
       const newOrder = new Booking({
         bookingId: data._id,
         userId: customer.metadata.userId,
         paymentId: data.payment_intent,
         services: items,
-   
+        serviceName:serviceNames,
+        userName: customer.metadata.name,
         Total: customer.metadata.total,
         payment_status: data.payment_status,
         address: customer.metadata.address,
@@ -208,27 +213,30 @@ const createOrder = async (customer, data, io, res, session) => {
 
       newOrder.status = 'pending';
       const newBooking = await newOrder.save();
-      console.log(newBooking, '.....')
+      console.log(newBooking, '.....---------------------------------------------------------------------')
       const serviceId = items[0].serviceId;
-
+console.log(serviceId,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
       const service = await Service.findById(serviceId);
 
       const category = service.category;
 
       const providersInCategory = await Provider.find({ category });
 
+console.log(providersInCategory,"+++++++++++++++++++++++++++++++++++++++++++++++")
       const userLocation = {
         latitude: customer.metadata.latitude,
         longitude: customer.metadata.longitude,
       };
+      console.log(userLocation,">>>>>")
 
       const providersWithDistances = providersInCategory.map((provider) => {
         const providerLocation = {
           latitude: provider.latitude,
           longitude: provider.longitude,
         };
+        console.log(providerLocation,'{}{{}{}{}{}{}{}{')
         const distance = geolib.getDistance(userLocation, providerLocation);
-        console.log(distance, "-------------------------------------------------------------------------------------------------------------------");
+        console.log(distance, "-----------------------------------------------------distance--------------------------------------------------------------");
         return { ...provider._doc, distance };
       });
 
@@ -243,29 +251,30 @@ const createOrder = async (customer, data, io, res, session) => {
       console.log(newBooking, "Booking created");
 
       nearbyProviders.forEach((provider) => {
+        console.log( "ISNIDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
         io.to(`provider_${provider._id}`).emit('new-booking-for-provider', { booking: newBooking });
       });
-      cron.schedule('*/2 * * * *', async () => {
+      cron.schedule('*/10 * * * *', async () => {
         const currentTime = Date.now();
-        const timeThreshold = 2 * 60 * 1000; 
-      
+        const timeThreshold = 10 * 60 * 1000;
+
         const unacceptedBookings = await Booking.find({
           status: 'pending',
           createdAt: { $lt: new Date(currentTime - timeThreshold) },
         });
 
         for (const booking of unacceptedBookings) {
-        const refund=booking.Total
-        console.log(refund,'>>>>>>')
+          const refund = booking.Total
+          console.log(refund, '>>>>>>')
 
 
           console.log("inside cron")
-          booking.status='canceled'
+          booking.status = 'canceled'
           const canceledBooking = await booking.save();
-          await updateUserwallet(booking.userId,refund)
-          console.log(canceledBooking,'>>>>>>>>>>>>>>>>>>>>>>')
+          await updateUserwallet(booking.userId, refund)
+          console.log(canceledBooking, '>>>>>>>>>>>>>>>>>>>>>>')
           io.emit('cancel-booking', { bookingId: canceledBooking._id });
-          
+
         }
       })
 
@@ -278,19 +287,18 @@ const createOrder = async (customer, data, io, res, session) => {
   }
 };
 
-const updateUserwallet=async(userId,refund)=>
-{
+const updateUserwallet = async (userId, refund) => {
   console.log('ssusususususuysuysuysuysuysuysuys')
-try {
-  const user=await User.findById(userId)
-  user.Wallet+=refund
+  try {
+    const user = await User.findById(userId)
+    user.Wallet += refund
 
-  await user.save()
-  console.log(`User ${user._id}'s wallet balance updated: $${user.Wallet}`);
+    await user.save()
+    console.log(`User ${user._id}'s wallet balance updated: $${user.Wallet}`);
 
-} catch (error) {
-  console.log(error.message)
-}
+  } catch (error) {
+    console.log(error.message)
+  }
 }
 
 

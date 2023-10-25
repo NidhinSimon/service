@@ -4,10 +4,14 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import ProfileModal from "../components/USer/ProfileModal";
 import { FaRupeeSign } from "react-icons/fa";
+import UserNav from "./UserNav";
+import { toast, Toaster } from "react-hot-toast";
 
 const Profile = () => {
   const [profile, setProfile] = useState([]);
   const [modal, showModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
 
   const { id } = useParams();
 
@@ -25,10 +29,16 @@ const Profile = () => {
     console.log(id);
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setSelectedImage(file);
+  };
+  
+
   return (
     <>
-      <Navbar />
-      <div className="bg-slate-100 h-auto p-4 md:p-10 mt-10">
+  <UserNav/>
+      <div className="bg-slate-100 h-auto p-4 md:p-0 mt-6">
         <div className="bg-white h-1/2 rounded-2xl p-4 md:p-8">
           <div className="bg-slate-200  md:h-60 w-full rounded-lg flex flex-col md:flex-row items-center">
             <img
@@ -36,11 +46,11 @@ const Profile = () => {
               src={profile.profileimage}
               alt="Profile"
             />
-            <div className="mt-4 md:mt-0 md:ml-10 w-3/5">
-              <button type="" className="btn btn-primary w-full md:w-44">
+            {/* <div className="mt-4 md:mt-0 md:ml-10 w-3/5">
+              <button   type="" className="btn btn-primary w-full md:w-44">
                 Upload New Photo
               </button>
-            </div>
+            </div> */}
             <div className=" w-2/5 h-full flex justify-center items-center">
             <h1 className="text-lg font-semibold flex items-center">
                 <FaRupeeSign className="mr-2" /> Wallet Balance:
@@ -66,8 +76,9 @@ const Profile = () => {
             <div className="bg-slate-100 mt-4 h-64  rounded-xl flex justify-evenly   ">
               <div className="bg-slate-100 w-56 h-40 mt-10 text-center">
                 <h1 className="text-">Email</h1>
+                
                 <input
-                  className="w-48  rounded-xl h-10 mt-3  "
+                  className="w-64  rounded-xl h-10 mt-3  "
                   type="text"
                   name="profile"
                   id=""
@@ -77,7 +88,7 @@ const Profile = () => {
               <div className="bg-slate-100 w-56 h-40 mt-10 text-center">
                 <h1 className="">Name</h1>
                 <input
-                  className="w-48  rounded-xl h-10 mt-3 "
+                  className="w-64  rounded-xl h-10 mt-3 "
                   type="text"
                   name="name"
                   id=""
@@ -87,7 +98,7 @@ const Profile = () => {
               <div className="bg-slate-100 w-56 h-40 mt-10 text-center">
                 <h1 className="">Mobile</h1>
                 <input
-                  className="w-48  rounded-xl h-10 mt-3  "
+                  className="w-64 rounded-xl h-10 mt-3  "
                   type="text"
                   name=""
                   id=""

@@ -153,10 +153,10 @@ const ServiceDetail = () => {
       cart,
       appliedCoupon: selectedCoupon,
     };
-  
+
     navigate("/checkout", { state: checkoutData });
   };
-  
+
   return (
     <>
       <UserNav />
@@ -170,7 +170,7 @@ const ServiceDetail = () => {
             <div className="text-md breadcrumbs relative top-28 flex justify-center">
               <ul>
                 <li>
-                  <a>Home</a>
+                  <a onClick={() => navigate("/home")}>Home</a>
                 </li>
                 <li>
                   <a>{category}</a>
@@ -182,7 +182,7 @@ const ServiceDetail = () => {
           <div className="p-5">
             <div className="bg-slate-100 w-full h-screen">
               <div className="bg-slate-100 w-4/6 h-24 flex justify-end z-10">
-                <div className="relative mt-5  inline-block text-left z-10 ">
+                {/* <div className="relative mt-5  inline-block text-left z-10 ">
                   <button
                     id="dropdownDefaultButton"
                     onClick={handleDropdownToggle}
@@ -205,10 +205,9 @@ const ServiceDetail = () => {
                         d="m1 1 4 4 4-4"
                       />
                     </svg>
-                  </button>
+                  </button> */}
 
-                  {/* Dropdown menu */}
-                  <div
+                {/* <div
                     id="dropdown"
                     className={`${
                       isDropdownVisible ? "" : "hidden"
@@ -251,8 +250,8 @@ const ServiceDetail = () => {
                         </a>
                       </li>
                     </ul>
-                  </div>
-                </div>
+                  </div> */}
+                {/* </div> */}
               </div>
               <div className="w-full h-screen">
                 <div className="w-full h-full md:flex">
@@ -322,7 +321,7 @@ const ServiceDetail = () => {
                               </button>
                             </div>
                           ))}
-                          <div>
+                          {/* <div>
                             <Button onClick={handleCoupon}>
                               Apply coupoondd
                             </Button>
@@ -342,14 +341,14 @@ const ServiceDetail = () => {
                                 X
                               </button>
                             )}
-                          </div>
+                          </div> */}
 
                           <div className="bg-indigo-500 text-white rounded-lg h-10 flex justify-between mt-2 ">
                             <p className="ml-3 mt-1">
-                              Total: $
+                              Total: ₹
                               {selectedCoupon
                                 ? calculateDiscountedTotal()
-                                : calculateCartTotal().toFixed(2)}
+                                : calculateCartTotal().toFixed()}
                             </p>
 
                             <button onClick={handleCheckout} className="mr-3">

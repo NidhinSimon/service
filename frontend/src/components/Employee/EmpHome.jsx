@@ -8,15 +8,16 @@ import axios from "axios";
 const EmpHome = () => {
   const { providerInfo } = useSelector((state) => state.employee);
   const providerId = providerInfo.provider._id;
-  console.log(providerId, "...");
+
   const socket = io("http://localhost:5000");
   const [requests, setRequests] = useState([]);
 
   useEffect(() => {
     socket.emit("join-provider-room", providerId);
 
+
     socket.on("cancel-booking", (data) => {
-      // Remove the canceled booking from the UI
+     
       const canceledBookingId = data.bookingId;
       setRequests((prevRequests) =>
         prevRequests.filter((booking) => booking._id !== canceledBookingId)
@@ -24,11 +25,14 @@ const EmpHome = () => {
     });
 
     socket.on("new-booking-for-provider", (data) => {
+      console.log(data,"_______________________________________________________________________________________--")
       const newBooking = data.booking;
+      console.log(newBooking,">>>>>>>>>>>>>>>>>>>>>>>>>...")
       if (
         newBooking.status !== "accepted" &&
         !requests.find((booking) => booking._id === newBooking._id)
       ) {
+        toast.success("New booking request received");
         setRequests((prevRequests) => [...prevRequests, newBooking]);
       }
     });
@@ -100,8 +104,8 @@ const EmpHome = () => {
                 className="bg-white p-4 shadow-md rounded-lg flex flex-col space-y-2"
               >
                 <div>
-                  <p>Booking ID: {booking._id}</p>
-                  <p>User Name: {booking.userId}</p>
+                  <p className=" text-lg text-indigo-500">Service Name: {booking.serviceName}</p>
+                  <p>Name: {booking.userName}</p>
                   <p>Location: {booking.address}</p>
                   <p>Total: {booking.Total}</p>
                 </div>

@@ -14,6 +14,7 @@ import toast, { Toaster } from "react-hot-toast";
 import Sidebarcoupon from "../components/Sidebar/Sidebar";
 import { Button } from "primereact/button";
 import { FaTrash } from "react-icons/fa";
+import User from "../../../server/models/userModel";
 
 const Checkout = () => {
   const [sidebar, setsidebar] = useState(false);
@@ -25,6 +26,13 @@ const Checkout = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [latitude, setlatitude] = useState("");
   const [longitude, setlongitude] = useState("");
+console.log(userInfo,">>>>")
+  const username=userInfo.userExists.name
+  console.log(username,"....")
+
+  const userNumber=userInfo.userExists.mobile
+
+  console.log(userNumber)
 
   useEffect(() => {
     const storedCoupon = localStorage.getItem("selectedCoupon");
@@ -159,8 +167,10 @@ const Checkout = () => {
   };
 
   const handlecheckout = async () => {
+    const itemNames = cart.map((item) => item.name);
     console.log("DHDGDHDGHGH");
     console.log(
+      itemNames,
       userid,
       selectedDate,
       selectedAddress,
@@ -169,6 +179,7 @@ const Checkout = () => {
       ">>"
     );
 
+   
     await axios
       .post("http://localhost:5000/checkout", {
         userId: userid,
@@ -180,6 +191,7 @@ const Checkout = () => {
         address: selectedAddress,
         latitude: latitude,
         longitude: longitude,
+        name:username
       })
       .then((res) => {
         if (res.data.url) {
@@ -216,7 +228,7 @@ const Checkout = () => {
                   alt="dd"
                 />
               </div>
-              <h1 className="mt-2 ml-2">Send Booking Details To - </h1>
+              <h1 className="mt-2 ml-2">Send Booking Details To - <b> {userNumber}</b> </h1>
             </div>
             {/*   address */}
             <div className="bg-blue-100 h-24 w-full mt-5 rounded-lg flex ">

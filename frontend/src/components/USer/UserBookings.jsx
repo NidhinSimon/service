@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../Pages/Navbar';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
+import UserNav from '../../Pages/UserNav';
+import toast from 'react-hot-toast';
 
 const UserBookings = () => {
   const [bookings, setBookings] = useState([]);
@@ -38,12 +40,18 @@ const UserBookings = () => {
   const handleCancel=async(id)=>{
     console.log(id,'>>')
     const res=await axios.post(`http://localhost:5000/users/canceluser/${id}`)
+    console.log(res,">>.")
+
+    if(res.data.success)
+    {
+        toast.success("cancellled successfully")
+    }
     console.log(res,">>>>>>>>>>>>>")
   }
 
   return (
     <>
-      <Navbar />
+   <UserNav/>
       <div className="bg-gray-100 p-4 rounded-md shadow-md mt-16">
         <h2 className="text-xl font-semibold mb-4">Your Bookings</h2>
         <div className="flex space-x-4 mb-4">
@@ -79,11 +87,16 @@ const UserBookings = () => {
                 }`}
               >
                 <div>
-                  <h3 className="text-lg font-semibold">{booking.serviceName}</h3>
+                {booking.serviceName.map((service, index) => (
+  <p key={index} className="text-xl font-semibold text-indigo-600">
+  {service}
+</p>
+))}
+                  {/* <h3 className="text-lg font-semibold">{booking.serviceName}</h3> */}
                   <p className="text-gray-600">Date: {booking.date}</p>
 
                   <p className="text-gray-600">Address: {booking.address}</p>
-                 Total: <button className="btn btn-active btn-ghost">{booking.Total}</button>
+                 Total: <button className="btn btn-active btn-accent">{booking.Total}</button>
                 </div>
                 <div className="space-x-4">
 

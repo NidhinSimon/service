@@ -16,11 +16,16 @@ const booking = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Service'
             },
+           
 
 
         }
     ],
-    serviceName: {
+
+    serviceName: [{
+        type: String
+    }],
+    userName: {
         type: String,
 
     },

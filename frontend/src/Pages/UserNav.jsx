@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLogoutMutation } from "../slices/backendSlice";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../slices/userSlice";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 const UserNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => {
@@ -33,7 +35,7 @@ const UserNav = () => {
   return (
     <nav className="container px-6 py-4 mx-auto md:flex md:justify-between md:items-center">
       <div className="flex items-center justify-between">
-        <a href="#">
+        <a href="#" onClick={()=>navigate('/home')}>
           <img className="w-auto h-10 sm:h-14" src="" alt="Logo" />
         </a>
 
@@ -93,13 +95,13 @@ const UserNav = () => {
           >
             Home
           </a>
-          <a
+          {/* <a
             className="my-2 text-gray-700 transition-colors duration-300 transform dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 md:mx-4 md:my-0"
             href="#"
           >
             Services
-          </a>
-          <a
+          </a> */}
+          <a onClick={()=>navigate('/bookings')}
             className="my-2 text-gray-700 transition-colors duration-300 transform dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 md:mx-4 md:my-0"
             href="#"
           >
@@ -119,7 +121,8 @@ const UserNav = () => {
                 className="my-2 text-gray-700 transition-colors duration-300 transform dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 md:mx-4 md:my-0"
                 href="#"
               >
-                logout
+               <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+  Logout
               </a>
             </>
           ) : (

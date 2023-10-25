@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
+import UserNav from './UserNav';
 
 const Success = () => {
   const [providerInfo, setProviderInfo] = useState(null); // State to hold provider information
@@ -39,10 +40,10 @@ const Success = () => {
    
     const loadingTimeout = setTimeout(() => {
       setLoading(false);
-    }, 9000); 
+    }, 15000); 
 
     return () => {
-      // Clear the providerInfoTimeout and loadingTimeout when unmounting the component
+    
       clearTimeout(providerInfoTimeout);
       clearTimeout(loadingTimeout);
     };
@@ -50,10 +51,10 @@ const Success = () => {
 
   return (
     <>
-    <Navbar/>
+  <UserNav/>
    
     <div className="flex justify-center items-center h-screen">
-      {loading ? ( // Initial loading state
+      {loading ? ( 
         <div className="bg-slate-300 w-72 sm:w-96 h-48 rounded-xl flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 z-10">
           <span className="loading loading-spinner text-success"></span>
           <h1 className="text-center text-lg sm:text-xl md:text-xl lg:text-xl">
@@ -72,7 +73,7 @@ const Success = () => {
            <p>Age:{providerInfo.age}</p>
           </div>
         </div>
-      ) : ( // No provider found state
+      ) : (
         <div className="bg-slate-300 w-72 sm:w-96 h-48 rounded-xl flex flex-col justify-center items-center p-4 sm:p-6 lg:p-8 z-10">
           <h1 className="text-center text-lg sm:text-xl md:text-xl lg:text-xl">
             No Providers Found. Please try again later.

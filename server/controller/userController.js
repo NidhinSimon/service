@@ -282,6 +282,7 @@ const canceluser = async (req, res) => {
 
 
   await user.save()
+  res.json({success:true})
 }
 
 export {

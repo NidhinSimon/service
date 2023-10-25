@@ -69,23 +69,23 @@ const UserHome = () => {
         </div>
       </header>
 
-      <h1 className="text-center mt-16 text-xl">OUR SERVICES</h1>
-      <div className="grid grid-cols-2  sm:grid-cols-3 gap-6 ml-12 md:grid-cols-3 lg:grid-cols-6 mx-auto  sm:mx-12 md:ml-36 lg:ml-40 mt-12">
+      <h1 className="text-center mt-16 text-xl font-semibold">OUR SERVICES</h1>
+      <div className="grid grid-cols-2  sm:grid-cols-3 gap-6 ml-12 md:grid-cols-3 lg:grid-cols-4 mx-auto  sm:mx-12 md:ml-36 lg:ml-40 mt-12">
         {categories.map((category) => (
           <div
             onClick={() => handleServiceCLick(category._id)}
             key={category.id}
-            className="card card-compact w-32 bg-base-100 shadow-xl rounded-2xl border"
+            className="card card-compact w-56 bg-base-100 shadow-xl rounded-2xl border"
           >
             <figure>
               <img
                 src={category.categoryimage}
                 alt={category.name}
-                className="h-20 w-20 mt-6 mx-auto"
+                className="h-48 w-40 mt-6 mx-auto"
               />
             </figure>
             <div className="card-body">
-              <h2 className="card-title text-center text-sm ">
+              <h2 className="card-title text-center text-lg ">
                 {category.name}
               </h2>
             </div>

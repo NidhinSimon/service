@@ -278,9 +278,9 @@ const AllService = () => {
                   <th scope="col" className="px-6 py-3">
                     Action
                   </th>
-                  <th scope="col" className="px-6 py-3">
+                  {/* <th scope="col" className="px-6 py-3">
                     CATEGORY
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
@@ -315,7 +315,7 @@ const AllService = () => {
                         Edit
                       </button>
                     </td>
-                    <td className="px-6 py-4">{i.category}</td>
+                    {/* <td className="px-6 py-4">{i.category}</td> */}
                   </tr>
                 ))}
               </tbody>

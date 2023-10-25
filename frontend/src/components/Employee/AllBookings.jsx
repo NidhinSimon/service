@@ -44,18 +44,23 @@ const AllBookings = () => {
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-xl font-semibold text-indigo-600">
-                    {booking.address}
-                  </p>
+
+                {booking.serviceName.map((service, index) => (
+  <p key={index} className="text-xl font-semibold text-indigo-600">
+  {service}
+</p>
+))}
+                 
                   <p className="text-sm text-gray-500">
                     <strong>Date:</strong> {booking.date}
                   </p>
                   <p className="text-sm text-gray-500">
-                    <strong>User:</strong> {booking.username}
+                    <strong>User:</strong> {booking.userName}
                   </p>
                   <p className="text-sm text-gray-500">
                     <strong>Amount:</strong> {booking.Total}
                   </p>
+
                 
                 </div>
                 <button
