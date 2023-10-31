@@ -74,6 +74,10 @@ const providerSchema = mongoose.Schema({
     },
     socketId:{
         type:String
+    },
+    Wallet: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true

@@ -73,7 +73,7 @@ const Login = () => {
       })
       .catch((error) => {
         console.error("OTP Verification Error:", error);
-        toast.error("OTP invalid");
+    
       });
   };
 
@@ -93,7 +93,7 @@ const Login = () => {
         toast.error("provider does not exist");
       }
     } catch (error) {
-      toast.error(error.message);
+     console.log(error.message)
     } finally {
     }
   };

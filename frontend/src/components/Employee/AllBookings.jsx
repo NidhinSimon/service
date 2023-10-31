@@ -24,6 +24,34 @@ const AllBookings = () => {
       });
   }, [providerId]);
 
+  const handleCancel = async (bookingId) => {
+    try {
+      console.log(bookingId, "...");
+      const response = await axios.post(
+        `http://localhost:5000/cancel/${bookingId}`
+      );
+      console.log(response, ">>>>>>>>>>>>>");
+      if (response.data.success) {
+        toast("Booking Cancelled Successfully", {
+          icon: "👏",
+          style: {
+            borderRadius: "10px",
+            background: "#333",
+            color: "#fff",
+          },
+        });
+
+        const updatedBookings = upcomingBookings.filter(
+          (booking) => booking._id !== bookingId
+        );
+        setUpcomingBookings(updatedBookings);
+      }
+    } catch (error) {
+      console.error("Error canceling booking:", error);
+      setError("Failed to cancel the booking. Please try again later.");
+    }
+  };
+
   return (
     <div className="booking-list p-4">
       <h2 className="text-3xl font-bold text-center text-indigo-600 mb-4">
@@ -64,11 +92,11 @@ const AllBookings = () => {
                 
                 </div>
                 <button
-                  onClick={() => handleCancel(booking._id)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none"
-                >
-                  Cancel Booking
-                </button>
+                    onClick={() => handleCancel(booking._id)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none"
+                  >
+                    Cancel Booking
+                  </button>
               </div>
             </li>
           ))

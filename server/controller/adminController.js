@@ -4,6 +4,7 @@ import Service from "../models/serviceModel.js"
 import User from '../models/userModel.js'
 import cloudinary from 'cloudinary'
 import { generateAdminToken } from "../utils/generateToke.js"
+import Report from "../models/ReportModel.js"
 const adminLogin = async (req, res) => {
 
     const { email, password } = req.body
@@ -135,6 +136,18 @@ const unBlockUser = async (req, res) => {
 }
 
 
+const getReports=async(req,res)=>{
+    try {
+        const reports=await Report.find()
+        .populate('reporterId','name')
+        .populate('providerId','name')
+
+        res.json(reports)
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
 
 export {
     adminLogin,
@@ -144,5 +157,6 @@ export {
     allusers,
     deleteservices,
     blockUser,
-    unBlockUser
+    unBlockUser,
+    getReports
 }

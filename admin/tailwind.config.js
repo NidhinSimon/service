@@ -8,18 +8,18 @@ export default {
   theme: {
     extend: {},
   },
-plugins: [
+  plugins: [
     require('daisyui'),
     require('flowbite/plugin'),
-   
+
 
   ],
-  
-  daisyui:{
-    darkTheme:"light"
+
+  daisyui: {
+    darkTheme: "light"
   },
-  flowbite:{
-    darkTheme:"light"
+  flowbite: {
+    darkTheme: "light"
   }
 }
 

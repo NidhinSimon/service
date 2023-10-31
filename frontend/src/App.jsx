@@ -37,9 +37,17 @@ import Bookings from "./components/Employee/Bookings";
 import UpcomingBookings from "./components/Employee/UpcomingBookings";
 import AllBookings from "./components/Employee/AllBookings";
 import UserBookings from "./components/USer/UserBookings";
+import Wishlist from "./components/USer/Wishlist";
+
+import ChatProvider from "./Context/ChatProvider";
+import Chats from "./components/USer/USerModal/Chat";
+import Chat from "./components/Employee/EmpChat/CHat";
 
 function App() {
   return (
+    <ChatProvider  >
+
+
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <PrimeReactProvider>
         <Router>
@@ -63,16 +71,27 @@ function App() {
             <Route path="/bookings" element={<UserBookings />} />
             <Route path="/empbookings" element={<Bookings />} />
 
+
+            <Route path='/wishlist' element={<Wishlist/>}/>
+
             <Route path="" element={<PrivateRoute />}>
               <Route path="/profile/:id" element={<Profile />} />
               <Route path="/home" element={<UserHome />} />
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/service/:id" element={<ServiceDetailpage />} />
+
+
+              <Route path="/userChat" element={<Chats/>}/>
+
+
+<Route path='/chat' element={<Chat/>}/>
+
             </Route>
           </Routes>
         </Router>
       </PrimeReactProvider>
     </LocalizationProvider>
+    </ChatProvider>
   );
 }
 

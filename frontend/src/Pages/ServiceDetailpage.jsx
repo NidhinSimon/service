@@ -98,13 +98,6 @@ const ServiceDetail = () => {
     console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>>>");
   };
 
-  const handleCoupon = async () => {
-    setsidebar(true);
-  };
-
-  const handleDropdownToggle = () => {
-    setIsDropdownVisible(!isDropdownVisible);
-  };
   const handleRemove = async (item) => {
     // dispatch(removeFromCart(item));
 
@@ -139,12 +132,6 @@ const ServiceDetail = () => {
     setsidebar(false);
   };
 
-  const removeCoupon = () => {
-    setSelectedcoupon(null);
-    // Remove the selected coupon from local storage
-    localStorage.removeItem("selectedCoupon");
-  };
-
   const handleCheckout = () => {
     const checkoutData = {
       total: selectedCoupon
@@ -156,6 +143,37 @@ const ServiceDetail = () => {
 
     navigate("/checkout", { state: checkoutData });
   };
+  const [selectedSortingOption, setSelectedSortingOption] =
+    useState("Low to High");
+
+  const handleSortingOptionChange = (e) => {
+    const selectedOption = e.target.value;
+    setSelectedSortingOption(selectedOption);
+    // You can sort the services here based on the selectedOption and update the services state.
+  };
+
+  // Sort the services based on the selectedSortingOption
+  const sortedServices = services.slice().sort((a, b) => {
+    if (selectedSortingOption === "Low to High") {
+      return a.price - b.price;
+    } else if (selectedSortingOption === "High to Low") {
+      return b.price - a.price;
+    }
+  });
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filterServices = (services, query) => {
+    return services.filter((service) => {
+      return service.title.toLowerCase().includes(query.toLowerCase());
+    });
+  };
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const filteredServices = filterServices(sortedServices, searchQuery);
 
   return (
     <>
@@ -181,83 +199,55 @@ const ServiceDetail = () => {
 
           <div className="p-5">
             <div className="bg-slate-100 w-full h-screen">
-              <div className="bg-slate-100 w-4/6 h-24 flex justify-end z-10">
-                {/* <div className="relative mt-5  inline-block text-left z-10 ">
-                  <button
-                    id="dropdownDefaultButton"
-                    onClick={handleDropdownToggle}
-                    className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                    type="button"
-                  >
-                    Dropdown button{" "}
-                    <svg
-                      className="w-2.5 h-2.5 ml-2.5"
-                      aria-hidden="true"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 10 6"
-                    >
-                      <path
+              <div className="bg-slate-100 w-4/6 h-24 flex justify-end z-10 b">
+              <div className="form-control ">
+                  <div className="input-group ">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={handleSearch}
+                      placeholder="Search…"
+                      className="input input-bordered "
+                    />
+                    <button className="btn btn-square bg-slate-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6 "
+                        fill="none"
+                        viewBox="0 0 24 24"
                         stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="m1 1 4 4 4-4"
-                      />
-                    </svg>
-                  </button> */}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
 
-                {/* <div
-                    id="dropdown"
-                    className={`${
-                      isDropdownVisible ? "" : "hidden"
-                    } z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700`}
+                <div className="filter-container ml-auto">
+                  <label htmlFor="sortingOption">Sort by Price:</label>
+                  <select
+                    id="sortingOption"
+                    value={selectedSortingOption}
+                    onChange={handleSortingOptionChange}
                   >
-                    <ul
-                      className="py-2 text-sm text-gray-700 dark:text-gray-200"
-                      aria-labelledby="dropdownDefaultButton"
-                    >
-                      <li>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                        >
-                          Dashboard
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                        >
-                          Settings
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                        >
-                          Earnings
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          href="#"
-                          className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                        >
-                          Sign out
-                        </a>
-                      </li>
-                    </ul>
-                  </div> */}
-                {/* </div> */}
+                    <option value="Low to High">Low to High</option>
+                    <option value="High to Low">High to Low</option>
+                  </select>
+                </div>
+            
+
+             
               </div>
               <div className="w-full h-screen">
                 <div className="w-full h-full md:flex">
                   <div className="w-full  md:w-4/6 ">
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-1 lg:grid-cols-1   ">
-                      {services.map((service) => (
+                      {filteredServices.map((service) => (
                         <div
                           className="card card-side bg-base-100  md:h-auto lg:h-48 shadow-sm"
                           key={service.id}

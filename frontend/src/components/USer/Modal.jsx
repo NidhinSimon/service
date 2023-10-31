@@ -10,15 +10,14 @@ import Spinner from "../Employee/Spinner";
 mapboxgl.accessToken =
   "pk.eyJ1IjoibmlkaGluc2ltb24iLCJhIjoiY2xtcnRnMXRuMDl6djJrcW05b2EzZHk3dSJ9.mBz6318PCWKLjMF-TxK-IQ";
 
-const Modal = ({ closemodal ,handlelocation}) => {
+const Modal = ({ closemodal, handlelocation }) => {
   const [map, setMap] = useState(null);
   const [userLocationMarker, setUserLocationMarker] = useState(null);
   const [address, setAddress] = useState("");
   const [longitude, setLongitude] = useState("");
   const [latitude, setLatitude] = useState("");
-  const [isLoadingMap, setIsLoadingMap] = useState(true); 
-  const [isLoadingSelectAddress, setIsLoadingSelectAddress] = useState(false); 
-  
+  const [isLoadingMap, setIsLoadingMap] = useState(true);
+  const [isLoadingSelectAddress, setIsLoadingSelectAddress] = useState(false);
 
   const { userInfo } = useSelector((state) => state.user);
   const userid = userInfo.userExists._id;
@@ -41,9 +40,9 @@ const Modal = ({ closemodal ,handlelocation}) => {
       longitude,
       latitude,
     });
-    handlelocation({address,longitude,latitude})
+    handlelocation({ address, longitude, latitude });
 
-    setIsLoadingSelectAddress(false); 
+    setIsLoadingSelectAddress(false);
 
     if (res.data.message === "user address saved") {
       Swal.fire(

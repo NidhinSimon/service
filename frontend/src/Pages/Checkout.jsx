@@ -15,6 +15,7 @@ import Sidebarcoupon from "../components/Sidebar/Sidebar";
 import { Button } from "primereact/button";
 import { FaTrash } from "react-icons/fa";
 import User from "../../../server/models/userModel";
+import AddressModal from "../components/USer/USerModal/AddressModal";
 
 const Checkout = () => {
   const [sidebar, setsidebar] = useState(false);
@@ -26,13 +27,34 @@ const Checkout = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [latitude, setlatitude] = useState("");
   const [longitude, setlongitude] = useState("");
-console.log(userInfo,">>>>")
-  const username=userInfo.userExists.name
-  console.log(username,"....")
 
-  const userNumber=userInfo.userExists.mobile
+  const [isAddressModalOpen, setAddressModalOpen] = useState(false);
+  const [userAddresses, setUserAddresses] = useState([]);
+  console.log(userInfo, ">>>>");
+  const userId = userInfo.userExists._id;
+  const username = userInfo.userExists.name;
+  console.log(username, "....");
 
-  console.log(userNumber)
+  const userNumber = userInfo.userExists.mobile;
+
+  console.log(userNumber);
+
+  const openAddressModal = () => {
+    setAddressModalOpen(true);
+
+    fetchUserAddresses();
+  };
+
+  const fetchUserAddresses = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/users/addresses/${userId}`
+      );
+      setUserAddresses(res.data);
+    } catch (error) {
+      console.error("Error fetching user addresses: ", error);
+    }
+  };
 
   useEffect(() => {
     const storedCoupon = localStorage.getItem("selectedCoupon");
@@ -179,7 +201,6 @@ console.log(userInfo,">>>>")
       ">>"
     );
 
-   
     await axios
       .post("http://localhost:5000/checkout", {
         userId: userid,
@@ -191,7 +212,7 @@ console.log(userInfo,">>>>")
         address: selectedAddress,
         latitude: latitude,
         longitude: longitude,
-        name:username
+        name: username,
       })
       .then((res) => {
         if (res.data.url) {
@@ -211,6 +232,26 @@ console.log(userInfo,">>>>")
     setlongitude(data.longitude);
   };
 
+  const handleAddress = async () => {
+    setAddressModalOpen(true);
+  };
+
+  const handleMap = async () => {
+    setMapmodal(true);
+  };
+
+  const handleAddresss = (address) => {
+    try {
+      setSelectedAddress(address);
+    } catch (error) {
+      console.error("Error selecting address:", error);
+    }
+  };
+
+  const handleAddressClose = async () => {
+    setAddressModalOpen(false);
+  };
+
   return (
     <>
       <Toaster />
@@ -228,7 +269,9 @@ console.log(userInfo,">>>>")
                   alt="dd"
                 />
               </div>
-              <h1 className="mt-2 ml-2">Send Booking Details To - <b> {userNumber}</b> </h1>
+              <h1 className="mt-2 ml-2">
+                Send Booking Details To - <b> {userNumber}</b>{" "}
+              </h1>
             </div>
             {/*   address */}
             <div className="bg-blue-100 h-24 w-full mt-5 rounded-lg flex ">
@@ -240,21 +283,24 @@ console.log(userInfo,">>>>")
                 />
               </div>
               <h1 className="mt-8 ml-5 text-lg font-bold "> Address</h1>
-              <div className="flex w-full mt-10    justify-center align-middle ">
+              <div className="flex w-full mt-10 justify-center align-middle">
                 {selectedAddress ? (
-                  <p className="text-lg font-bold ml-5">
-                    Selected Address: {selectedAddress}
-                  </p>
+                  <p>Selected Address: {selectedAddress}</p>
                 ) : (
-                  <button
-                    onClick={() => setMapmodal(true)}
-                    className="bg-indigo-600 text-white rounded-xl h-10 w-32 md:mr-16"
-                  >
-                    Select Address
-                  </button>
+                  <div>
+                    <button onClick={handleAddress}>Select Address</button>
+                    <button onClick={handleMap}>Select on Map</button>
+                  </div>
                 )}
               </div>
             </div>
+            {isAddressModalOpen && (
+              <AddressModal
+                onClose={handleAddressClose}
+                userAddresses={userAddresses}
+                setSelectedAddress={handleAddresss}
+              />
+            )}
 
             {/*   slot */}
 

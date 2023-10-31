@@ -20,6 +20,8 @@ import { acceptBooking } from './controller/providerController.js';
 import { init } from './controller/providerController.js';
 import cron from 'node-cron'
 import User from './models/userModel.js';
+import chatRoute from './routes/chatRoute.js';
+import messageRouter from './routes/MessgaeRoute.js';
 
 
 const port = process.env.PORT;
@@ -41,6 +43,8 @@ const io = new Server(server, {
   }
 });
 
+
+let activeUsers = []
 io.on("connection", (socket) => {
 
   socket.join(`provider_${socket.id}`);
@@ -52,13 +56,53 @@ io.on("connection", (socket) => {
   });
   socket.on('join-provider-room', (providerId) => {
     socket.join(`provider_${providerId}`);
+    console.log(`${providerId}dggdghdgdhgdhghdg`)
   });
-  
 
-  socket.emit('test', 'message ddddddddddddddddddddrrrrrrrrrrrrrsent to the user sideeeeeeeeeeeeeeeeeeeeee')
+  socket.on("new-user-add", (newUserId) => {
+    if (!activeUsers.some((user) => user.userId === newUserId)) {
+      activeUsers.push({
+        userId: newUserId,
+        socketId: socket.id
+      })
+
+    }
+    console.log("connencted",activeUsers)
+    io.emit('get-users', activeUsers)
+  })
+
+
+  socket.on("send-message",(data)=>{
+    const {receiverId}=data
+    const user=activeUsers.find((user)=>user.userId===receiverId)
+    console.log(user,">>>>>>sendinf from socket ",receiverId)
+    console.log("data",data)
+    if(user)
+    {
+      io.to(user.socketId).emit("receive-message",data)
+    }
+
+  })
+
+
+
+  // socket.on('joinChatRoom', ({ userId, providerId, bookingId }) => {
+  //   const roomId = `chat_${bookingId}`;
+  //   socket.join(roomId);
+  //   io.to(providerId).emit('userJoined', userId);
+
+  //   socket.on('chat message', (msg) => {
+
+  //     io.to(roomId).emit('chat message', msg);
+  //   });
+  // });
+
 
 
   socket.on('disconnect', () => {
+    activeUsers = activeUsers.filter((user) => user.socketId !== socket.id)
+    console.log("USer disconnected", activeUsers)
+    io.emit('get-users', activeUsers)
   });
 });
 
@@ -95,6 +139,8 @@ cloudinary.v2.config({
 app.use('/users', userRoutes);
 app.use('/admin', adminRoute);
 app.use(serviceRoute);
+app.use(chatRoute)
+app.use(messageRouter)
 
 
 
@@ -103,7 +149,7 @@ app.use(serviceRoute);
 app.post('/checkout', async (req, res) => {
   console.log('inside checkout route');
 
-console.log(req.body,"______------->>>>>>>>>")
+  console.log(req.body, "______------->>>>>>>>>")
   const total = req.body.total
 
   if (isNaN(total)) {
@@ -124,7 +170,7 @@ console.log(req.body,"______------->>>>>>>>>")
       },
     });
 
-    
+
 
     session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -195,13 +241,13 @@ const createOrder = async (customer, data, io, res, session) => {
 
       const serviceNames = items.map(item => item.name);
 
-console.log(serviceNames,"~~~~~~~~~~~~~~~~~~~~~~~~~~~~+==============================================~~~")
+      console.log(serviceNames, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~+==============================================~~~")
       const newOrder = new Booking({
         bookingId: data._id,
         userId: customer.metadata.userId,
         paymentId: data.payment_intent,
         services: items,
-        serviceName:serviceNames,
+        serviceName: serviceNames,
         userName: customer.metadata.name,
         Total: customer.metadata.total,
         payment_status: data.payment_status,
@@ -215,26 +261,26 @@ console.log(serviceNames,"~~~~~~~~~~~~~~~~~~~~~~~~~~~~+=========================
       const newBooking = await newOrder.save();
       console.log(newBooking, '.....---------------------------------------------------------------------')
       const serviceId = items[0].serviceId;
-console.log(serviceId,'%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
+      console.log(serviceId, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
       const service = await Service.findById(serviceId);
 
       const category = service.category;
 
       const providersInCategory = await Provider.find({ category });
 
-console.log(providersInCategory,"+++++++++++++++++++++++++++++++++++++++++++++++")
+      console.log(providersInCategory, "+++++++++++++++++++++++++++++++++++++++++++++++")
       const userLocation = {
         latitude: customer.metadata.latitude,
         longitude: customer.metadata.longitude,
       };
-      console.log(userLocation,">>>>>")
+      console.log(userLocation, ">>>>>")
 
       const providersWithDistances = providersInCategory.map((provider) => {
         const providerLocation = {
           latitude: provider.latitude,
           longitude: provider.longitude,
         };
-        console.log(providerLocation,'{}{{}{}{}{}{}{}{')
+        console.log(providerLocation, '{}{{}{}{}{}{}{}{')
         const distance = geolib.getDistance(userLocation, providerLocation);
         console.log(distance, "-----------------------------------------------------distance--------------------------------------------------------------");
         return { ...provider._doc, distance };
@@ -248,10 +294,12 @@ console.log(providersInCategory,"+++++++++++++++++++++++++++++++++++++++++++++++
         (provider) => provider.distance <= maxDistance
       );
 
+      console.log(nearbyProviders, ">>>>>>>>>>>>>>>..")
+
       console.log(newBooking, "Booking created");
 
       nearbyProviders.forEach((provider) => {
-        console.log( "ISNIDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+        console.log("ISNIDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", `${provider._id}`);
         io.to(`provider_${provider._id}`).emit('new-booking-for-provider', { booking: newBooking });
       });
       cron.schedule('*/10 * * * *', async () => {

@@ -1,12 +1,18 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faComment } from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { providerInfo } = useSelector((state) => state.employee);
   const providername = providerInfo.provider.name;
 
+
+  const handleChat=async()=>{
+    navigate('/chat')
+  }
   return (
     <nav className="fixed top-0 w-full border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 z-30 shadow-md">
       <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
@@ -64,10 +70,14 @@ const Navbar = () => {
               </a>
             </li>
             <li>
-              <div className="">
-                {providername}
-              </div>
+              <div className="">{providername}</div>
             </li>
+            <FontAwesomeIcon
+              onClick={handleChat}
+              className=""
+              icon={faComment}
+              style={{ fontSize: "30px", color: "pink" }}
+            />
           </ul>
         </div>
       </div>

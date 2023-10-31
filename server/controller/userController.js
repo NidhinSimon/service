@@ -5,6 +5,7 @@ import Service from "../models/serviceModel.js";
 import Category from '../models/CategoryModel.js'
 import Booking from "../models/BookingModel.js";
 import Provider from "../models/providerModel.js";
+import Report from "../models/ReportModel.js";
 
 
 const registerUser = async (req, res) => {
@@ -258,11 +259,10 @@ const getBookings = async (req, res) => {
 
 const userBookings = async (req, res) => {
   const { id } = req.params
-  console.log("id", id)
 
   const userBoooking = await Booking.find({ userId: id })
 
-  console.log(userBoooking, "......")
+
   res.json(userBoooking)
 }
 
@@ -282,11 +282,56 @@ const canceluser = async (req, res) => {
 
 
   await user.save()
-  res.json({success:true})
+  res.json({ success: true })
+}
+
+const reportProvider = async (req, res) => {
+  console.log(req.body, ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+  const { reportReason, userId } = req.body
+  const { id } = req.params
+  console.log(id, ">>>>>>>>")
+
+  try {
+    const report = new Report({
+      reporterId: userId,
+      providerId: id,
+      reportReason
+
+    })
+
+    const b = await report.save()
+    console.log(b, ")))))))))))))00")
+    res.json({message:"success",b})
+  } catch (error) {
+    console.log(error.message)
+  }
+
+}
+
+const getAddress=async(req,res)=>{
+  const {id}=req.params
+
+  try {
+    // Fetch the user by ID and return their addresses
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const addresses = user.addresses; 
+
+    res.json({message:"success",addresses});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+
 }
 
 export {
   registerUser,
+  getAddress,
   loginUser,
   checkNumber,
   getServices,
@@ -300,6 +345,7 @@ export {
   deletecart,
   getBookings,
   userBookings,
-  canceluser
+  canceluser,
+  reportProvider
 
 }
