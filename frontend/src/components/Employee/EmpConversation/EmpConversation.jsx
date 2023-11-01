@@ -5,7 +5,7 @@ import { getuserData } from '../../../api/chatRequest'
 import { Avatar } from 'flowbite-react';
 const EmpConversation= ({data,currentUser}) => {
 
-    
+
     const [userData,setuserData]=useState(null)
 
 
@@ -37,7 +37,7 @@ const EmpConversation= ({data,currentUser}) => {
           {userData?.name}
         </div>
         <div className="text-sm text-gray-500 dark:text-gray-400">
-       <span>Online</span>
+    
         </div>
       </div>
     </Avatar>

@@ -1,13 +1,20 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment } from "@fortawesome/free-solid-svg-icons";
-
+import { io } from "socket.io-client";
 const Navbar = () => {
   const navigate = useNavigate();
   const { providerInfo } = useSelector((state) => state.employee);
   const providername = providerInfo.provider.name;
+  const providerId = providerInfo.provider._id;
+
+  const socket = io("http://localhost:5000");
+
+  useEffect(()=>{
+    socket.emit("join-provider-room", providerId);
+  },[])
 
 
   const handleChat=async()=>{

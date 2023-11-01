@@ -23,8 +23,12 @@ const UserNav = () => {
     try {
       await logoutapi().unwrap();
       dispatch(logout());
+      
       navigate("/login");
-    } catch (error) {}
+      
+    } catch (error) {
+      console.log(error.message)
+    }
   };
 
   const handleProfile = async (id) => {

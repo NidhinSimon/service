@@ -68,7 +68,7 @@ const Login = () => {
           navigate("/emphome");
         } else {
           console.log("OTP verification failed");
-          toast.error("OTP verification failed");
+          // toast.error("OTP verification failed");
         }
       })
       .catch((error) => {

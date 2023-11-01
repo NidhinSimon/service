@@ -14,7 +14,7 @@ const AllBookings = () => {
     axios
       .get(`http://localhost:5000/allbookings/${providerId}`)
       .then((response) => {
-        console.log(response,'..')
+        console.log(response, "..");
         setBookings(response.data);
         setLoading(false);
       })
@@ -40,18 +40,17 @@ const AllBookings = () => {
             color: "#fff",
           },
         });
-
-        const updatedBookings = upcomingBookings.filter(
+        const updatedBookings = bookings.filter(
           (booking) => booking._id !== bookingId
         );
-        setUpcomingBookings(updatedBookings);
+        setBookings(updatedBookings);
+
       }
     } catch (error) {
       console.error("Error canceling booking:", error);
       setError("Failed to cancel the booking. Please try again later.");
     }
   };
-
   return (
     <div className="booking-list p-4">
       <h2 className="text-3xl font-bold text-center text-indigo-600 mb-4">
@@ -60,49 +59,44 @@ const AllBookings = () => {
       {loading ? (
         <Spinner />
       ) : (
-
         <ul className="space-y-4">
-        {bookings.length === 0 ? (
-          <p className="text-lg text-gray-600">No upcoming bookings at the moment.</p>
-        ) : (
-          bookings.map((booking) => (
-            <li
-              key={booking.id}
-              className="bg-gray-100 p-4 rounded-lg flex flex-col space-y-2"
-            >
-              <div className="flex justify-between items-center">
-                <div>
+          {bookings.length === 0 ? (
+            <p className="text-lg text-gray-600">
+              No upcoming bookings at the moment.
+            </p>
+          ) : (
+            bookings.map((booking) => (
+              <li
+                key={booking.id}
+                className="bg-gray-100 p-4 rounded-lg flex flex-col space-y-2"
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    {booking.serviceName.map((service, index) => (
+                      <p
+                        key={index}
+                        className="text-xl font-semibold text-indigo-600"
+                      >
+                        {service}
+                      </p>
+                    ))}
 
-                {booking.serviceName.map((service, index) => (
-  <p key={index} className="text-xl font-semibold text-indigo-600">
-  {service}
-</p>
-))}
+                    <p className="text-sm text-gray-500">
+                      <strong>Date:</strong> {booking.date}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <strong>User:</strong> {booking.userName}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <strong>Amount:</strong> {booking.Total}
+                    </p>
+                  </div>
                  
-                  <p className="text-sm text-gray-500">
-                    <strong>Date:</strong> {booking.date}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    <strong>User:</strong> {booking.userName}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    <strong>Amount:</strong> {booking.Total}
-                  </p>
-
-                
                 </div>
-                <button
-                    onClick={() => handleCancel(booking._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none"
-                  >
-                    Cancel Booking
-                  </button>
-              </div>
-            </li>
-          ))
-        )}
-      </ul>
- 
+              </li>
+            ))
+          )}
+        </ul>
       )}
     </div>
   );

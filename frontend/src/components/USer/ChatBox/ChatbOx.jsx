@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getuserData } from "../../../api/chatRequest";
 import { Avatar } from "flowbite-react";
 import { useFetcher } from "react-router-dom";
@@ -8,7 +8,8 @@ const Chatbox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
   const [userData, setuserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setnewMessage] = useState("");
-console.log(chat,"?????///")
+  const scroll = useRef();
+  console.log(chat, "?????///");
 
   useEffect(() => {
     const userId = chat?.members?.find((id) => id !== currentUser);
@@ -24,8 +25,6 @@ console.log(chat,"?????///")
     };
     if (chat !== null) getUser();
   }, [chat, currentUser]);
-
-
 
   useEffect(() => {
     if (receiveMessage !== null && receiveMessage.chatId === chat?._id) {
@@ -45,8 +44,6 @@ console.log(chat,"?????///")
     };
     if (chat !== null) fetchMessage();
   }, [chat]);
-
- 
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -68,6 +65,12 @@ console.log(chat,"?????///")
     setsendMessage({ ...message, receiverId });
   };
 
+
+
+  useEffect(()=>{
+    scroll.current?.scrollIntoView({behavior:"smooth"})
+  },[messages])
+
   return (
     <>
       <div className="chat-interface">
@@ -81,7 +84,7 @@ console.log(chat,"?????///")
                 <div className="space-y-1 font-medium dark:text-white">
                   <div className="">{userData?.name}</div>
                   <div className="text-sm text-gray-500 dark:text-gray-400">
-                    <span>Online</span>
+                
                   </div>
                 </div>
               </Avatar>
@@ -89,12 +92,22 @@ console.log(chat,"?????///")
             <div className="messages-box h-96 p-4 overflow-y-auto mb-4 ">
               {messages.map((m) => (
                 <>
-                               <div className="chat chat-start">
-  <div className="chat-bubble">{m.text}</div>
-</div>
-<div className="chat chat-end">
-  <div className="chat-bubble">{m.text}</div>
-</div>
+                  {/* <div className="chat chat-start">
+                    <div className="chat-bubble">{m.text}</div>
+                  </div>
+                  <div className="chat chat-end">
+                    <div className="chat-bubble">{m.text}</div>
+                  </div> */}
+
+                  <div ref={scroll}
+                    className={
+                      m.senderId === currentUser
+                      ? "chat chat-end"
+                      : "chat chat-start"
+                    }
+                  >
+                    <div className="chat-bubble">{m.text}</div>
+                  </div>
                 </>
               ))}
             </div>

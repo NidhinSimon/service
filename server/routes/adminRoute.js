@@ -1,5 +1,5 @@
 import express from 'express'
-import { adminLogin,addservice, allservice, editservice ,allusers, deleteservices,blockUser,unBlockUser,getReports} from '../controller/adminController.js'
+import { adminLogin,addservice, allservice, editservice ,allusers, deleteservices,blockUser,unBlockUser,getReports, rejectReport} from '../controller/adminController.js'
 import {addcategory,deleteCategory,editcategory,getcategories,} from '../controller/categoryController.js'
 import { couponadd, getcoupon,editcoupon ,editableCoupon,deleteCoupon} from '../controller/couponController.js'
 
@@ -23,6 +23,7 @@ adminRoute.get('/coupon/get/:id',editcoupon)
 adminRoute.put('/edit/:id',editableCoupon)
 adminRoute.delete('/delete/:id',deleteCoupon)
 adminRoute.get('/reports',getReports)
+adminRoute.put('/updateReportStatus/:reportId',rejectReport)
 
 
 

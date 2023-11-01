@@ -282,14 +282,24 @@ const Checkout = () => {
                   alt="ddd"
                 />
               </div>
-              <h1 className="mt-8 ml-5 text-lg font-bold "> Address</h1>
+              <h1 className="mt-4 ml-5 text-lg font-bold "> Address </h1>
               <div className="flex w-full mt-10 justify-center align-middle">
                 {selectedAddress ? (
-                  <p>Selected Address: {selectedAddress}</p>
+                  <p className="text-sm "><b>Address: </b> {selectedAddress}</p>
                 ) : (
                   <div>
-                    <button onClick={handleAddress}>Select Address</button>
-                    <button onClick={handleMap}>Select on Map</button>
+                    <button
+                      onClick={handleAddress}
+                      className="bg-blue-600 text-white h-10 w-36 rounded-lg m-2"
+                    >
+                      Select Address
+                    </button>
+                    <button
+                      onClick={handleMap}
+                      className="bg-blue-600 text-white h-10 w-36 rounded-lg m-2"
+                    >
+                      Select on Map
+                    </button>
                   </div>
                 )}
               </div>

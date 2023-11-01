@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getuserData } from "../../../api/chatRequest";
 import { Avatar } from "flowbite-react";
 import { useFetcher } from "react-router-dom";
@@ -8,6 +8,7 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
   const [userData, setuserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setnewMessage] = useState("");
+  const scroll = useRef();
 
   useEffect(() => {
     const userId = chat?.members?.find((id) => id !== currentUser);
@@ -63,6 +64,10 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
     setsendMessage({ ...message, receiverId });
   };
 
+  useEffect(() => {
+    scroll.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
     <>
       <div className="chat-interface">
@@ -75,19 +80,21 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
               <Avatar className="h-16" img={userData?.profileimage} rounded-md>
                 <div className="space-y-1 font-medium dark:text-white">
                   <div className="">{userData?.name}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    <span>Online</span>
-                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400"></div>
                 </div>
               </Avatar>
             </div>
             <div className="messages-box h-96 p-4 overflow-y-auto mb-4 ">
               {messages.map((m) => (
                 <>
-                  <div className="chat chat-start">
-                    <div className="chat-bubble">{m.text}</div>
-                  </div>
-                  <div className="chat chat-end">
+                  <div
+                    ref={scroll}
+                    className={
+                      m.senderId === currentUser
+                        ? "chat chat-end"
+                        : "chat chat-start"
+                    }
+                  >
                     <div className="chat-bubble">{m.text}</div>
                   </div>
                 </>

@@ -317,48 +317,48 @@ const getAllBookings = async (req, res) => {
 
 const cancelBooking = async (req, res) => {
     try {
-      const { id } = req.params;
-  
-      // Find the booking and update its status to 'canceled'
-      const booking = await Booking.findByIdAndUpdate(id);
-      booking.status = 'canceled';
-      const updatedBooking = await booking.save();
-  
-      // Find the associated user and update their Wallet
-      const user = booking.userId;
-      const userId = await User.findById(user);
-      userId.Wallet += booking.Total;
-      const updatedUser = await userId.save();
-  
-      res.status(200).json({ success: true, message: 'Booking canceled successfully' });
+        const { id } = req.params;
+
+        // Find the booking and update its status to 'canceled'
+        const booking = await Booking.findByIdAndUpdate(id);
+        booking.status = 'canceled';
+        const updatedBooking = await booking.save();
+
+        // Find the associated user and update their Wallet
+        const user = booking.userId;
+        const userId = await User.findById(user);
+        userId.Wallet += booking.Total;
+        const updatedUser = await userId.save();
+
+        res.status(200).json({ success: true, message: 'Booking canceled successfully', updatedBooking });
     } catch (error) {
-      console.error('Error canceling booking:', error);
-      res.status(500).json({ success: false, message: 'Failed to cancel the booking. Please try again later.' });
+        console.error('Error canceling booking:', error);
+        res.status(500).json({ success: false, message: 'Failed to cancel the booking. Please try again later.' });
     }
-  };
+};
 
 
-  const serviceName = async (req, res) => {
+const serviceName = async (req, res) => {
     const { id } = req.params;
-  
-    try {
-      
-      const service = await Service.findById(id);
-  
-      if (!service) {
-       
-        return res.status(404).json({ error: 'Service not found' });
-      }
-  
 
-      return res.json({ serviceName: service.name });
+    try {
+
+        const service = await Service.findById(id);
+
+        if (!service) {
+
+            return res.status(404).json({ error: 'Service not found' });
+        }
+
+
+        return res.json({ serviceName: service.name });
     } catch (error) {
-   
-      console.error('Error while fetching service:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+
+        console.error('Error while fetching service:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
-  };
-  
+};
+
 
 export {
     serviceName,

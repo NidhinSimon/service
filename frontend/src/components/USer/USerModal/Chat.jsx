@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { userChats } from "../../../api/chatRequest";
 import Conversations from "../Conversations/Conversation";
 import Chatbox from "../ChatBox/ChatbOx";
+import UserNav from "../../../Pages/UserNav";
 
 const Chat = () => {
   // const socket=io("http://localhost:5000")
@@ -19,6 +20,7 @@ const Chat = () => {
   const [sendMessage, setsendMessage] = useState(null);
   const [receiveMessage, setreceiveMessage] = useState(null);
   const socket = useRef();
+  const scroll=useRef()
 
   console.log(chats, ">>");
   useEffect(() => {
@@ -52,7 +54,10 @@ const Chat = () => {
   }, []);
 
   return (
-    
+    <>
+    <UserNav/>
+
+
 <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 flex h-screen">
 
 <div className="w-1/4 bg-yellow-100 border-r p-4">
@@ -80,7 +85,7 @@ const Chat = () => {
 </div>
 
 </div>
-
+</>
  
   );
 };

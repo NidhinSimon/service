@@ -22,7 +22,7 @@ const Bookings = () => {
       Your Bookings
       </header> */}
       <nav className="flex justify-center space-x-4 mb-4">
-        {/* <button
+        <button
           className={`py-2 px-4 rounded focus:outline-none ${
             activeTab === "upcoming"
               ? "bg-blue-500 text-white"
@@ -31,8 +31,8 @@ const Bookings = () => {
           onClick={() => handleTabChange("upcoming")}
         >
           Upcoming Bookings
-        </button> */}
-        {/* <button
+        </button>
+        <button
           className={`py-2 px-4 rounded focus:outline-none ${
             activeTab === "all"
               ? "bg-blue-500 text-white"
@@ -41,7 +41,7 @@ const Bookings = () => {
           onClick={() => handleTabChange("all")}
         >
           All Bookings
-        </button> */}
+        </button>
       </nav>
       {activeTab === "upcoming" ? <UpcomingBookings /> : <AllBookings />}
     </div>

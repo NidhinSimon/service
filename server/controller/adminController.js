@@ -136,15 +136,37 @@ const unBlockUser = async (req, res) => {
 }
 
 
-const getReports=async(req,res)=>{
+const getReports = async (req, res) => {
     try {
-        const reports=await Report.find()
-        .populate('reporterId','name')
-        .populate('providerId','name')
+        const reports = await Report.find()
+            .populate('reporterId', 'name  ')
+            .populate('providerId', 'name isBlocked _id')
 
         res.json(reports)
     } catch (error) {
         console.log(error.message)
+    }
+}
+
+const rejectReport = async (req, res) => {
+    const { reportId } = req.params;
+
+    try {
+        const report = await Report.findById(reportId);
+        if (!report) {
+            return res.status(404).json({ message: 'Report not found' });
+        }
+
+        // Update the report status to "rejected"
+        report.status = 'rejected';
+
+        // Save the updated report
+        await report.save();
+
+        res.json({ message: 'Report status updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal server error' });
     }
 }
 
@@ -158,5 +180,6 @@ export {
     deleteservices,
     blockUser,
     unBlockUser,
-    getReports
+    getReports,
+    rejectReport
 }

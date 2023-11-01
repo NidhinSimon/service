@@ -7,6 +7,7 @@ import { userChats } from "../../../api/chatRequest";
 import EmpConversation from "../EmpConversation/EmpConversation";
 import EmpChatBox from "../EmpChatBox/EmpChatbox";
 import UserNav from "../../../Pages/UserNav";
+import Navbar from "../Navbar";
 
 
 const Chat = () => {
@@ -59,7 +60,7 @@ const Chat = () => {
   return (
     <>
 
-   
+<Navbar/>
 <div className="relative bg-white rounded-lg shadow dark:bg-gray-700 flex h-screen">
 
 <div className="w-1/4 bg-yellow-100 border-r p-4">

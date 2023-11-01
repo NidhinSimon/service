@@ -1,9 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+
 const Navbar = () => {
 
-
+  const location = useLocation();
   const navigate=useNavigate()
   return (
     <nav className="fixed top-0 w-full border-gray-200 bg-gray-50 dark:bg-gray-800 dark:border-gray-700 z-30 shadow-md">

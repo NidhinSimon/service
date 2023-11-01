@@ -200,7 +200,7 @@ const ServiceDetail = () => {
           <div className="p-5">
             <div className="bg-slate-100 w-full h-screen">
               <div className="bg-slate-100 w-4/6 h-24 flex justify-end z-10 b">
-              <div className="form-control ">
+                <div className="form-control ">
                   <div className="input-group ">
                     <input
                       type="text"
@@ -239,45 +239,50 @@ const ServiceDetail = () => {
                     <option value="High to Low">High to Low</option>
                   </select>
                 </div>
-            
-
-             
               </div>
               <div className="w-full h-screen">
                 <div className="w-full h-full md:flex">
                   <div className="w-full  md:w-4/6 ">
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-1 lg:grid-cols-1   ">
-                      {filteredServices.map((service) => (
-                        <div
-                          className="card card-side bg-base-100  md:h-auto lg:h-48 shadow-sm"
-                          key={service.id}
-                        >
-                          <figure>
-                            <img
-                              className="w-32 h-32 bg-blue-300 ml-5 rounded-lg border"
-                              src={service.image}
-                              alt="Movie"
-                            />
-                          </figure>
-                          <div className="card-body">
-                            <h2 className="card-title ">{service.title}</h2>
+                      {filteredServices.length === 0 ? (
+                        <p className="text-center text-gray-500 font-semibold uppercase text-lg">
+                          No service found{" "}
+                        </p>
+                      ) : (
+                        <>
+                          {filteredServices.map((service) => (
+                            <div
+                              className="card card-side bg-base-100  md:h-auto lg:h-48 shadow-sm"
+                              key={service.id}
+                            >
+                              <figure>
+                                <img
+                                  className="w-32 h-32 bg-blue-300 ml-5 rounded-lg border"
+                                  src={service.image}
+                                  alt="Movie"
+                                />
+                              </figure>
+                              <div className="card-body">
+                                <h2 className="card-title ">{service.title}</h2>
 
-                            {/* <button onClick={()=>setModal(true)} className='text-blue-600 rounded-lg  w-24 h-auto'>View details</button> */}
+                                {/* <button onClick={()=>setModal(true)} className='text-blue-600 rounded-lg  w-24 h-auto'>View details</button> */}
 
-                            <p className="">{service.description}</p>
-                            <p>{service.price}</p>
+                                <p className="">{service.description}</p>
+                                <p>{service.price}</p>
 
-                            <div className="card-actions align-middle justify-end">
-                              <button
-                                className="btn btn-primary  text-white text-xs lg:w-28  sm:w-16 md:w-20   "
-                                onClick={() => handleBook(service, userid)}
-                              >
-                                BOOK NOW
-                              </button>
+                                <div className="card-actions align-middle justify-end">
+                                  <button
+                                    className="btn btn-primary  text-white text-xs lg:w-28  sm:w-16 md:w-20   "
+                                    onClick={() => handleBook(service, userid)}
+                                  >
+                                    BOOK NOW
+                                  </button>
+                                </div>
+                              </div>
                             </div>
-                          </div>
-                        </div>
-                      ))}
+                          ))}
+                        </>
+                      )}
                     </div>
                   </div>
                   <div className=" w-full md:w-2/6 h-auto bg-slate-100 border p-2">

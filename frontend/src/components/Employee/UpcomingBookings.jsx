@@ -5,6 +5,7 @@ import Spinner from "./Spinner";
 import { AddressAutofill } from "@mapbox/search-js-react";
 import Booking from "../../../../server/models/BookingModel";
 import toast, { Toaster } from "react-hot-toast";
+import io from "socket.io-client";
 
 const UpcomingBookings = () => {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
@@ -13,6 +14,8 @@ const UpcomingBookings = () => {
 
   const { providerInfo } = useSelector((state) => state.employee);
   const providerId = providerInfo.provider._id;
+
+  const socket = io('http://localhost:5000'); // Connect to your server's socket.io
 
   useEffect(() => {
     axios
@@ -28,7 +31,12 @@ const UpcomingBookings = () => {
         setError("Failed to fetch upcoming bookings. Please try again later.");
         setLoading(false);
       });
-  }, []);
+
+    // Listen for real-time updates
+    socket.on('updatedBookings', (updatedBookings) => {
+      setUpcomingBookings(updatedBookings);
+    });
+  }, [providerId, socket]);
 
   const handleCancel = async (bookingId) => {
     try {
@@ -46,11 +54,11 @@ const UpcomingBookings = () => {
             color: "#fff",
           },
         });
-
         const updatedBookings = upcomingBookings.filter(
           (booking) => booking._id !== bookingId
         );
         setUpcomingBookings(updatedBookings);
+
       }
     } catch (error) {
       console.error("Error canceling booking:", error);
@@ -64,7 +72,7 @@ const UpcomingBookings = () => {
       <h2 className="text-3xl font-bold mb-4">Upcoming Bookings</h2>
       {loading ? (
         <Spinner />
-      ) : error ? ( // Display an error message if there's an error
+      ) : error ? (
         <p className="text-lg text-red-600">{error}</p>
       ) : (
         <ul className="space-y-4">
@@ -74,10 +82,7 @@ const UpcomingBookings = () => {
             </p>
           ) : (
             upcomingBookings.map((booking) => (
-              <li
-                key={booking.id}
-                className="bg-gray-100 p-4 rounded-lg flex flex-col space-y-2"
-              >
+              <li key={booking.id} className="bg-gray-100 p-4 rounded-lg flex flex-col space-y-2">
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-xl font-semibold text-indigo-600">
@@ -90,13 +95,10 @@ const UpcomingBookings = () => {
                       <strong>User:</strong> {booking.username}
                     </p>
                     {booking.serviceName.map((service, index) => (
-  <p key={index} className="text-xl font-semibold text-indigo-600">
-    
-    {service}
-  </p>
-))}
-                   
-                   
+                      <p key={index} className="text-xl font-semibold text-indigo-600">
+                        {service}
+                      </p>
+                    ))}
                   </div>
                   <button
                     onClick={() => handleCancel(booking._id)}

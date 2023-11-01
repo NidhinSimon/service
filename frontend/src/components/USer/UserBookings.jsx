@@ -77,7 +77,11 @@ const UserBookings = () => {
     console.log(res, ">>.");
 
     if (res.data.success) {
-      toast.success("cancellled successfully");
+      window.location.reload()
+      socket.emit("cancelBooking", id);
+
+      toast.success("Cancelled successfully");
+      setBookings(updatedBookings);
     }
     console.log(res, ">>>>>>>>>>>>>");
   };
@@ -143,9 +147,9 @@ const UserBookings = () => {
             All
           </button>
         </div>
-        {bookings.length === 0 ? (
-          <p className="text-center text-gray-600">You have no bookings yet.</p>
-        ) : (
+        {bookings.length === 0 && activeTab === 'accepted' ? (
+  <p className="text-center text-gray-600  h-screen mt-48">You have no upcoming bookings.</p>
+) : (
           <ul className="space-y-4">
             {filterBookings(activeTab).map((booking) => (
               <li

@@ -78,7 +78,8 @@ const LoginScreen = () => {
         navigate("/home");
       })
       .catch((error) => {
-        toast.error("otp invalid");
+        // toast.error("otp invalid");
+        console.log(error.message)
       });
   };
 
