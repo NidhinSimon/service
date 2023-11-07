@@ -6,6 +6,8 @@ import Request from "../models/RequestModel.js";
 import Booking from "../models/BookingModel.js";
 import Service from "../models/serviceModel.js";
 
+import Admin from "../models/adminModel.js";
+import WalletHistory from "../models/wallerHistoryModal.js";
 
 let io;
 
@@ -279,7 +281,7 @@ const acceptBooking = async (req, res) => {
 
 const getUpcoming = async (req, res) => {
     const { id } = req.params;
-    console.log(id, '>>>>')
+    // console.log(id, '>>>>')
 
     try {
         // Get the current date
@@ -291,7 +293,7 @@ const getUpcoming = async (req, res) => {
             date: { $gte: currentDate }, // Filter for dates on or after the current date
             status: 'accepted',
         });
-        console.log(upcoming, ">>>>>>")
+        // console.log(upcoming, ">>>>>>")
 
         res.json(upcoming);
     } catch (error) {
@@ -316,6 +318,7 @@ const getAllBookings = async (req, res) => {
 }
 
 const cancelBooking = async (req, res) => {
+    console.log('inside cancel')
     try {
         const { id } = req.params;
 
@@ -329,6 +332,17 @@ const cancelBooking = async (req, res) => {
         const userId = await User.findById(user);
         userId.Wallet += booking.Total;
         const updatedUser = await userId.save();
+
+
+        const walletHistoryEntry = new WalletHistory({
+            userId: user,
+            amount:booking.Total,
+            reason:"Service Cancelled By Provider",
+            type: "Credit",
+        });
+
+        await walletHistoryEntry.save();
+
 
         res.status(200).json({ success: true, message: 'Booking canceled successfully', updatedBooking });
     } catch (error) {
@@ -360,6 +374,63 @@ const serviceName = async (req, res) => {
 };
 
 
+const completeBooking=async(req,res)=>{
+    console.log("inside")
+    const { otp } = req.body;
+    const bookingId = req.params.bookingId;
+
+    console.log(otp,">>>>>>>>>>>>>>>>>>",bookingId)
+  
+    try {
+        // Fetch booking and related data from the database
+        const booking = await Booking.findById(bookingId);
+        console.log(booking, "....");
+        const adminemail = process.env.ADMIN_EMAIL;
+        const adminWallet = await Admin.findOne({ email: adminemail });
+        const providerWallet = await Provider.findById(booking.provider);
+
+        // Check if OTP matches
+        // if (otp === booking.otp) {
+        // Calculate 10% of the booking amount
+        const adminCut = booking.Total * 0.1;
+        const providerCut = booking.Total - adminCut;
+
+        console.log(adminCut, '----------------', providerCut);
+
+        // Update wallet balances
+        adminWallet.Wallet += adminCut;
+        providerWallet.Wallet += providerCut;
+
+        // Save wallet changes
+        const adminWalletSaved = await adminWallet.save();
+        console.log(adminWalletSaved, "admin Wallet");
+
+        const providerWalletSaved = await providerWallet.save();
+        console.log(providerWalletSaved, "provider wallet");
+
+        // Mark the booking as completed or update its status
+        booking.workStatus = "completed";
+        await booking.save();
+
+        const walletHistoryEntry = new WalletHistory({
+            userId: booking.provider,
+            amount:providerCut,
+            type: "Credit",
+        });
+
+        await walletHistoryEntry.save()
+
+        return res.json({ message: "OTP verified, funds transferred" });
+        // } else {
+        //   return res.status(400).json({ message: "Invalid OTP" });
+        // }
+
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: "Server error" });
+    }
+}
+
 export {
     serviceName,
     init,
@@ -376,5 +447,6 @@ export {
     acceptBooking,
     getUpcoming,
     getAllBookings,
-    cancelBooking
+    cancelBooking,
+    completeBooking
 }

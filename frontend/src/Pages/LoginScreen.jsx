@@ -4,14 +4,20 @@ import {
   getAuth,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  signInWithPopup,
 } from "firebase/auth";
+import { jwtDecode } from "jwt-decode";
 
-import { auth } from "../components/firebase.config";
+import { auth, provider } from "../components/firebase.config";
 import { useDispatch, useSelector } from "react-redux";
 import { useLoginMutation } from "../slices/backendSlice";
 import { setCredentials } from "../slices/userSlice";
 import toast, { Toaster } from "react-hot-toast";
 import { PinInput, PinInputField, HStack } from "@chakra-ui/react";
+import { GoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import { googlelogin } from "../slices/userSlice";
+import { useGoogleMutation } from "../slices/backendSlice";
 import axios from "axios";
 const LoginScreen = () => {
   const [number, setNumber] = useState("");
@@ -78,12 +84,14 @@ const LoginScreen = () => {
         navigate("/home");
       })
       .catch((error) => {
-        // toast.error("otp invalid");
-        console.log(error.message)
+        toast.error("otp invalid");
+        console.log(error.message);
       });
   };
 
   const [loginuser] = useLoginMutation();
+
+  const [googleLogin]=useGoogleMutation()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -109,6 +117,37 @@ const LoginScreen = () => {
     setIsResendDisabled(true);
     setOtpTimer(60);
   };
+
+
+
+  const [gmail,setgmail]=useState("")
+  const handleGoogleLogin = async (decoded) => {
+   console.log(decoded.email)
+   const email = decoded.email;
+   
+
+console.log(gmail,">>>")
+  //  const response=await axios.post('http://localhost:5000/users/verifyGooglelogin',email)
+  //  console.log(response,"???/")
+const res=await googleLogin({email}).unwrap()
+console.log(res,";")
+
+dispatch(googlelogin({...res}))
+   if(res.message==='User login successful')
+   {
+    navigate("/home")
+   }
+   if(res.message==='User not registered')
+   {
+    // navigate('/register')
+    toast.error("Email Doesnt Exist Please create a new account")
+   }
+   
+  };
+
+
+
+
 
   return (
     <>
@@ -219,6 +258,21 @@ const LoginScreen = () => {
                     ""
                   )} */}
                   </button>
+                
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      var decoded=jwtDecode(credentialResponse.credential)
+                      console.log(decoded);
+                      if(decoded)
+                      {
+                        handleGoogleLogin(decoded)
+                      }
+                    }}
+                    onError={() => {
+                      console.log("Login Failed");
+                    }}
+                  />
+                  
                   <div className="text-center">
                     <a
                       href="#"

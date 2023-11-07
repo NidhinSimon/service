@@ -19,6 +19,10 @@ const userSlice = createSlice({
             state.userInfo = null;
             localStorage.removeItem('userInfo');
         },
+        googlelogin: (state, action) => {
+            state.userInfo = action.payload
+            localStorage.setItem('userInfo', JSON.stringify(action.payload));
+        },
         saveAddress: (state, action) => {
             state.userInfo.addresses.push(action.payload);
             localStorage.setItem('userInfo', JSON.stringify(state.userInfo));
@@ -30,5 +34,5 @@ const userSlice = createSlice({
     },
 });
 
-export const { setCredentials, logout, addToCart, saveAddress } = userSlice.actions;
+export const { setCredentials, logout, addToCart, saveAddress,googlelogin } = userSlice.actions;
 export default userSlice.reducer;

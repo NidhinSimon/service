@@ -18,7 +18,11 @@ import {
     userBookings,
     canceluser,
     reportProvider,
-    getAddress
+    getAddress,
+    addwishlist,
+    getWishlist,
+    WalletHistory,
+    verifyGoogle
 
 } from '../controller/userController.js'
 import { cancelBooking } from '../controller/providerController.js'
@@ -44,6 +48,13 @@ router.post('/canceluser/:id', canceluser)
 router.post('/reportProvider/:id', reportProvider)
 
 router.get('/addresses/:id', getAddress)
+router.post('/wishlist/add/:userId',addwishlist)
+router.get('/wishlist/:userId',getWishlist)
+
+
+router.get('/wallet-history/:userId',WalletHistory)
+
+router.post("/verifyGooglelogin",verifyGoogle)
 
 
 export default router

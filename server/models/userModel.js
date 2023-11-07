@@ -40,7 +40,16 @@ const userSchema = mongoose.Schema({
     Wallet: {
         type: Number,
         default: 0
-    }
+    },
+    EndOtp:{
+        type:Number
+    },
+    wishlist: [
+        {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Service',
+        },
+      ],
 
 
 

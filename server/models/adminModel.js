@@ -9,6 +9,10 @@ const adminSchema=mongoose.Schema({
     password:{
         type:String,
         required:true
+    },
+    Wallet: {
+        type: Number,
+        default: 0
     }
 })
 

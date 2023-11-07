@@ -9,7 +9,7 @@ import { setCredentials } from "../slices/userSlice";
 
 
 
-import { getAuth, RecaptchaVerifier , signInWithPhoneNumber} from "firebase/auth";
+import { getAuth, RecaptchaVerifier , signInWithPhoneNumber,GoogleAuthProvider,signInWithPopup} from "firebase/auth";
 
 import { PinInput, PinInputField, HStack } from "@chakra-ui/react";
 
@@ -173,6 +173,21 @@ const RegisterScree = () => {
     );
   };
 
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+  
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      // You can now use the 'user' object to get user information and handle the sign-in process.
+      setUser(user);
+      // Redirect or perform other actions as needed.
+    } catch (error) {
+      console.error("Google Sign-In Error: ", error);
+    }
+  };
+  
+
   return (
     <>
       <div className="border border-black h-screen bg-gradient-to-tl from-blue-400 to-cyan-100"  >
@@ -327,6 +342,13 @@ const RegisterScree = () => {
                       ""
                     )}
                   </button>
+                  <button
+  onClick={handleGoogleSignIn}
+  className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-gray-800 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring focus:ring-gray-300 focus:ring-opacity-50"
+>
+  Sign In with Google
+</button>
+
                  <div className="text-center">
                  <a
         href="#"

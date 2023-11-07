@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../../Pages/Navbar";
+
 import { useSelector } from "react-redux";
 import axios from "axios";
 import UserNav from "../../Pages/UserNav";
@@ -13,7 +14,7 @@ import Swal from "sweetalert2";
 import Modal from "react-modal";
 import io from "socket.io-client";
 import Chat from "./USerModal/Chat";
-import { ChatState } from "../../Context/ChatProvider";
+
 import { useNavigate } from "react-router-dom";
 
 const UserBookings = () => {
@@ -26,6 +27,9 @@ const UserBookings = () => {
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportReason, setreportReason] = useState("");
   const [providerIdToReport, setProviderIdToReport] = useState("");
+  const [bookingOTP, setBookingOTP] = useState("");
+
+  const [viewDetails, setView] = useState(false);
 
   const socket = io("http://localhost:5000");
   const handleReport = (providerId) => {
@@ -70,20 +74,29 @@ const UserBookings = () => {
   };
 
   const handleCancel = async (id) => {
-    console.log(id, ">>");
-    const res = await axios.post(
-      `http://localhost:5000/users/canceluser/${id}`
-    );
-    console.log(res, ">>.");
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/users/canceluser/${id}`
+      );
 
-    if (res.data.success) {
-      window.location.reload()
-      socket.emit("cancelBooking", id);
+      if (response.data.success) {
+        const updatedBookings = bookings.filter(
+          (booking) => booking._id !== id
+        );
 
-      toast.success("Cancelled successfully");
-      setBookings(updatedBookings);
+        setBookings(updatedBookings);
+        socket.emit("cancelBooking", id);
+        Swal.fire({
+          icon: "success",
+          title: "Booking Canceled",
+          text: "The booking has been canceled successfully.",
+        });
+      } else {
+        toast.error("Failed to cancel booking");
+      }
+    } catch (error) {
+      console.error("Error:", error);
     }
-    console.log(res, ">>>>>>>>>>>>>");
   };
 
   const submitReport = async () => {
@@ -119,6 +132,34 @@ const UserBookings = () => {
     navigate("/userChat");
   };
 
+  const setViewDetails = (otp) => {
+    console.log(otp, "__");
+    setView(true);
+    setBookingOTP(otp);
+  };
+
+  const openChat = async (booking) => {
+    try {
+      // Make an API request to create a chat between the user and provider
+      const response = await axios.post("http://localhost:5000/chat", {
+        userId: userInfo.userExists._id,
+        providerId: booking.provider, // Replace with the actual provider ID
+      });
+  
+      if (response.status === 200) {
+        // Chat has been successfully created, you can open the chat modal here
+        setChatModalOpen(true);
+        navigate("/userChat");
+      } else {
+        // Handle any errors that might occur during chat creation
+        console.error("Failed to create chat");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+
   return (
     <>
       <UserNav />
@@ -147,10 +188,12 @@ const UserBookings = () => {
             All
           </button>
         </div>
-        {bookings.length === 0 && activeTab === 'accepted' ? (
-  <p className="text-center text-gray-600  h-screen mt-48">You have no upcoming bookings.</p>
-) : (
-          <ul className="space-y-4">
+        {bookings.length === 0 && activeTab === "accepted" ? (
+          <p className="text-center text-gray-600  h-screen mt-48">
+            You have no upcoming bookings.
+          </p>
+        ) : (
+          <div className="block rounded-lg bg-white shadow-md dark:bg-neutral-700">
             {filterBookings(activeTab).map((booking) => (
               <li
                 key={booking._id}
@@ -160,7 +203,7 @@ const UserBookings = () => {
                     : booking.status === "upcoming"
                     ? "bg-blue-100"
                     : "bg-red-100"
-                }`}
+                } relative`}
               >
                 <div>
                   {booking.serviceName.map((service, index) => (
@@ -171,7 +214,6 @@ const UserBookings = () => {
                       {service}
                     </p>
                   ))}
-                  {/* <h3 className="text-lg font-semibold">{booking.serviceName}</h3> */}
                   <p className="text-gray-600">Date: {booking.date}</p>
                   <p className="text-gray-600">Address: {booking.address}</p>
                   Total:{" "}
@@ -180,14 +222,26 @@ const UserBookings = () => {
                   </button>
                 </div>
                 <p>{booking.provider}</p>
+                <p>B{booking.otp}</p>
                 <div className="space-x-4">
-                  <FontAwesomeIcon
+                  <button
                     onClick={() =>
                       booking.provider && handleReport(booking.provider)
                     }
-                    icon={faExclamationTriangle}
-                    style={{ color: "red" }}
-                  />
+                    className="absolute top-2 right-2 text-red-500"
+                  >
+                    <FontAwesomeIcon
+                      icon={faExclamationTriangle}
+                      style={{ fontSize: "24px" }}
+                    />
+                  </button>
+                  <button onClick={() => openChat(booking)} className="border">
+                    <FontAwesomeIcon
+                      icon={faComment}
+                      style={{ fontSize: "35px", color: "lightgrey" }}
+                    />
+                  </button>
+
                   {booking.status === "accepted" && (
                     <button
                       onClick={() => handleCancel(booking._id)}
@@ -197,18 +251,43 @@ const UserBookings = () => {
                     </button>
                   )}
 
-                  <FontAwesomeIcon
-                    onClick={() => openChatModal(booking)}
-                    className="mt-12"
-                    icon={faComment}
-                    style={{ fontSize: "50px", color: "blue" }}
-                  />
-                  {isChatModalOpen && <Chat providerId={booking.provider} />}
+                  <button
+                    onClick={() => setViewDetails(booking.otp)}
+                    className="px-4 mx-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                  >
+                    View Details
+                  </button>
                 </div>
               </li>
             ))}
-          </ul>
+          </div>
         )}
+
+        {viewDetails && (
+          <>
+            <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md rounded-lg">
+              <div className="bg-white p-4 rounded-md shadow-md max-w-sm">
+                <h2 className="text-xl font-semibold mb-4 text-center">Opt</h2>
+                <div className="w-full p-5 mb-2  ">
+                  Please dont share this Otp with Anyone OTP: {bookingOTP}
+                </div>
+                <button
+                  onClick={""}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Report
+                </button>
+                <button
+                  onClick={() => setView(false)}
+                  className="px-4 mx-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
         {reportModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-md rounded-lg">
             <div className="bg-white p-4 rounded-md shadow-md max-w-sm">

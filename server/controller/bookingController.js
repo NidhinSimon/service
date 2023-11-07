@@ -7,9 +7,13 @@ import geolib from 'geolib'
 import { acceptBooking } from './providerController.js';
 import cron from 'node-cron'
 import User from '../models/userModel.js';
+import { transferToAdminWallet } from '../utils/transferToAdminWallet.js';
+import otpGenerator from 'otp-generator'
 
 
+import { reduceFromAdminWallet } from '../utils/transferToAdminWallet.js';
 
+import WalletHistory from '../models/wallerHistoryModal.js'
 
 const stripe = new Stripe(process.env.SECRET_STRIPE_KEY);
 
@@ -30,8 +34,10 @@ const createOrder = async (customer, data, io, res, session) => {
             const items = JSON.parse(customer.metadata.cart);
 
             const serviceNames = items.map(item => item.name);
+            const otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false, specialChars: false, upperCase: false });
 
-            console.log(serviceNames, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~+==============================================~~~")
+            console.log(otp, "~~~~~~~~~~~~~~~~~~~~~~~~~")
+            // console.log(serviceNames, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~+==============================================~~~")
             const newOrder = new Booking({
                 bookingId: data._id,
                 userId: customer.metadata.userId,
@@ -45,11 +51,24 @@ const createOrder = async (customer, data, io, res, session) => {
                 date: customer.metadata.date,
                 latitude: customer.metadata.latitude,
                 longitude: customer.metadata.longitude,
+                otp
+
             });
 
+
+
             newOrder.status = 'pending';
+            newOrder.workStatus="pending"
+
             const newBooking = await newOrder.save();
-            console.log(newBooking, '.....---------------------------------------------------------------------')
+
+
+
+
+            // console.log(newBooking, '.....---------------------------------------------------------------------')
+            // const bookingAmount = newBooking.Total
+            // const updatedWalletBalance = await transferToAdminWallet(bookingAmount);
+            // console.log(`Admin's updated wallet balance: ${updatedWalletBalance}`);
             const serviceId = items[0].serviceId;
             console.log(serviceId, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
             const service = await Service.findById(serviceId);
@@ -58,7 +77,7 @@ const createOrder = async (customer, data, io, res, session) => {
 
             const providersInCategory = await Provider.find({ category });
 
-            console.log(providersInCategory, "+++++++++++++++++++++++++++++++++++++++++++++++")
+            // console.log(providersInCategory, "+++++++++++++++++++++++++++++++++++++++++++++++")
             const userLocation = {
                 latitude: customer.metadata.latitude,
                 longitude: customer.metadata.longitude,
@@ -84,9 +103,9 @@ const createOrder = async (customer, data, io, res, session) => {
                 (provider) => provider.distance <= maxDistance
             );
 
-            console.log(nearbyProviders, ">>>>>>>>>>>>>>>..")
+            // console.log(nearbyProviders, ">>>>>>>>>>>>>>>..")
 
-            console.log(newBooking, "Booking created");
+            // console.log(newBooking, "Booking created");
 
             nearbyProviders.forEach((provider) => {
                 console.log("ISNIDEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE", `${provider._id}`);
@@ -104,9 +123,15 @@ const createOrder = async (customer, data, io, res, session) => {
                 for (const booking of unacceptedBookings) {
                     const refund = booking.Total
                     console.log(refund, '>>>>>>')
+                    // const ioio = await reduceFromAdminWallet(refund);
+                    // console.log(ioio, ")_)_)_)___)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)_)__)_)_)")
 
 
-                    console.log("inside cron")
+
+
+
+
+                    console.log("inside cron ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
                     booking.status = 'canceled'
                     const canceledBooking = await booking.save();
                     await updateUserwallet(booking.userId, refund)
@@ -130,6 +155,15 @@ const updateUserwallet = async (userId, refund) => {
     try {
         const user = await User.findById(userId)
         user.Wallet += refund
+
+        const walletHistoryEntry = new WalletHistory({
+            userId: userId,
+            amount:refund,
+            reason:"No Service Provider Found",
+            type: "Credit",
+        });
+
+        await walletHistoryEntry.save();
 
         await user.save()
         console.log(`User ${user._id}'s wallet balance updated: $${user.Wallet}`);

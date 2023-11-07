@@ -17,6 +17,14 @@ export const usersApiSlice=apiSlice.injectEndpoints({
                 body:data
             })
         }),
+        google:builder.mutation({
+            query:(data)=>({
+                url:`${USERS_URL}/verifyGooglelogin`,
+                method:'POST',
+                body:data
+            })
+        }),
+        
         saveAddress: builder.mutation({ 
             query: (data) => ({
                 url: `${USERS_URL}/saveaddress`,
@@ -42,5 +50,5 @@ export const usersApiSlice=apiSlice.injectEndpoints({
 })
 
 export const {
-    useRegisterMutation,useLoginMutation,useLogoutMutation,useAddCartMutation
+    useRegisterMutation,useLoginMutation,useLogoutMutation,useAddCartMutation,useGoogleMutation
 }=usersApiSlice

@@ -1,43 +1,90 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import UserNav from "../../Pages/UserNav";
 
 const Wishlist = () => {
-  const [wishlist, setWishlist] = useState([
-    { id: 1, title: 'Product 1', price: 50, image: 'product1.jpg' },
-    { id: 2, title: 'Product 2', price: 75, image: 'product2.jpg' },
-    { id: 3, title: 'Product 3', price: 100, image: 'product3.jpg' },
-  ]);
+  const [wishlist, setWishlist] = useState([]);
+  const { userInfo } = useSelector((state) => state.user);
+  const userId = userInfo.userExists._id;
+
+  useEffect(() => {
+    axios
+      .get(`http://localhost:5000/users/wishlist/${userId}`)
+      .then((response) => {
+        setWishlist(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching wishlist items:", error);
+      });
+  }, [userId]);
 
   const removeFromWishlist = (id) => {
-    setWishlist(wishlist.filter((item) => item.id !== id));
+    axios
+      .delete(`/api/user/${userId}/wishlist/${id}`)
+      .then(() => {
+        setWishlist(wishlist.filter((item) => item._id !== id));
+      })
+      .catch((error) => {
+        console.error("Error removing item from wishlist:", error);
+      });
   };
 
-  const handleCheckout = (item) => {
-    // Add your checkout logic here
+  const navigate = useNavigate();
+
+  const handleCheckout = async (item) => {
+    const cartData = {
+      name: item.title,
+      price: item.price,
+      serviceId: item._id,
+    };
+
+    const res = await axios.post(`http://localhost:5000/users/cart`, {
+      cartData,
+      userId,
+    });
+
+    navigate("/checkout");
   };
 
   return (
-    <div className="bg-gradient-to-b from-blue-100 to-blue-200 py-16">
+
+    <>
+    <UserNav/>
+   
+    <div className="bg-white py-16">
       <div className="max-w-screen-xl mx-auto px-4">
-        <h1 className="text-4xl font-semibold text-gray-800 mb-8">My Wishlist</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+        <h1 className="text-2xl font-medium text-gray-800 mb-8 text-center">My Wishlist</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {wishlist.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-lg transform hover:scale-105 transition-transform duration-300">
-              <img src={item.image} alt={item.title} className="w-full h-64 object-cover" />
-              <div className="p-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-4">{item.title}</h2>
-                <p className="text-gray-600 text-lg mb-4">${item.price}</p>
+            <div
+              key={item._id}
+              className="bg-white rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300"
+            >
+              <img
+                src={item.image}
+                alt={item.title}
+                className="w-full h-44 object-fill"
+              />
+              <div className="p-4">
+                <h2 className="text-lg font-semibold text-gray-800 mb-2">
+                  {item.title}
+                </h2>
+                <p className="text-gray-600 text-base mb-2">₹{item.price}</p>
+                <p className="text-gray-600 text-base mb-2">{item.description}</p>
                 <div className="flex justify-between items-center">
                   <button
-                    onClick={() => removeFromWishlist(item.id)}
-                    className="text-white bg-red-500 hover:bg-red-600 py-2 px-4 rounded-full transition duration-300"
+                    onClick={() => removeFromWishlist(item._id)}
+                    className="text-white bg-red-500 hover:bg-red-600 py-2 px-3 rounded-full transition duration-300"
                   >
                     Remove
                   </button>
                   <button
                     onClick={() => handleCheckout(item)}
-                    className="text-white bg-blue-500 hover:bg-blue-600 py-2 px-4 rounded-full transition duration-300"
+                    className="text-white bg-blue-500 hover:bg-blue-600 py-2 px-3 rounded-full transition duration-300"
                   >
-                    Checkout
+                    Book Now
                   </button>
                 </div>
               </div>
@@ -51,6 +98,7 @@ const Wishlist = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

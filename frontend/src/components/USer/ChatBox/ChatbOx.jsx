@@ -3,12 +3,13 @@ import { getuserData } from "../../../api/chatRequest";
 import { Avatar } from "flowbite-react";
 import { useFetcher } from "react-router-dom";
 import { addMessage, getMessages } from "../../../api/messageRequest";
-
+import { format } from "timeago.js";
 const Chatbox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
   const [userData, setuserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setnewMessage] = useState("");
   const scroll = useRef();
+ 
   console.log(chat, "?????///");
 
   useEffect(() => {
@@ -106,7 +107,12 @@ const Chatbox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
                       : "chat chat-start"
                     }
                   >
-                    <div className="chat-bubble">{m.text}</div>
+                    <div className="chat-bubble">{m.text}
+                    
+                    </div>
+                    <time className="text-xs opacity-50">
+    {format(m.createdAt)} 
+  </time>
                   </div>
                 </>
               ))}

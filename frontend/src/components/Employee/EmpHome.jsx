@@ -53,7 +53,7 @@ const EmpHome = () => {
     return () => {
       socket.off("new-booking-for-provider");
     };
-  }, [providerId]);
+  }, [providerId,socket]);
 
   const handleAccept = (bookingId) => {
     console.log("ddhgdgdgh");

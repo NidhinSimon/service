@@ -7,6 +7,8 @@ import Booking from "../models/BookingModel.js";
 import Provider from "../models/providerModel.js";
 import Report from "../models/ReportModel.js";
 
+import Admin from "../models/adminModel.js";
+import Wallet from '../models/wallerHistoryModal.js'
 
 const registerUser = async (req, res) => {
 
@@ -74,6 +76,37 @@ const loginUser = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+const verifyGoogle = async (req, res) => {
+  console.log(req.body,'///')
+  const { email } = req.body
+  console.log(email, "-------")
+
+  try {
+
+
+    const userExists = await User.findOne({ email: email })
+    if (userExists) {
+      const token = generateToken(res, userExists._id)
+      console.log("User exists:", userExists);
+      res.json({
+        message: "User login successful",
+        userExists,
+        token
+      });
+    } else {
+      console.log("User not registered");
+      res.json({ message: "User not registered" })
+    }
+
+  } catch (error) {
+    console.log(error.message)
+  }
+
+
+}
+
 
 const getServices = async (req, res) => {
   console.log(req.params.id)
@@ -150,14 +183,55 @@ const profileEdit = async (req, res) => {
 
 }
 
+// const addtocart = async (req, res) => {
+//   try {
+//     const { cartData, userId } = req.body;
+//     console.log("Received cartData:", cartData);
+//     console.log("Received userId:", userId);
+
+//     // Find the user by their ID
+//     const user = await User.findById(userId);
+//     console.log("Found user:", user);
+
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     // Check if the item already exists in the cart
+//     const existingCartItem = user.cart.find((item) => item._id.toString() === cartData._id);
+
+//     if (existingCartItem) {
+//       // If the item already exists, replace it with the new one
+//       Object.assign(existingCartItem, cartData);
+//     } else {
+//       // If the item doesn't exist, add it to the cart
+//       user.cart.push(cartData);
+//     }
+
+//     console.log("Updated user's cart:", user.cart);
+
+//     const savedCart = await user.save();
+//     console.log(savedCart);
+//     res.status(200).json({
+//       cart: savedCart.cart,
+//       message: "Cart updated successfully"
+//     });
+//   } catch (error) {
+//     console.error("Error updating user's cart:", error);
+//     res.status(500).json({ error: "An error occurred while updating the user's cart" });
+//   }
+// };
+
+
+
 const addtocart = async (req, res) => {
   try {
-    const { cartData, userid } = req.body;
+    const { cartData, userId } = req.body;
     console.log("Received cartData>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>:", cartData);
-    console.log("Received userId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<:", userid);
+    console.log("Received userId<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<:", userId);
 
     // Find the user by their ID
-    const user = await User.findById(userid);
+    const user = await User.findById(userId);
     console.log("Found user:", user);
 
     if (!user) {
@@ -188,7 +262,6 @@ const addtocart = async (req, res) => {
     res.status(500).json({ error: "An error occurred while updating the user's cart" });
   }
 };
-
 
 
 const getcart = async (req, res) => {
@@ -281,7 +354,26 @@ const canceluser = async (req, res) => {
   user.Wallet += booking.Total
 
 
+
+  // const adminemail=process.env.ADMIN_EMAIL
+
+  // const admin=await Admin.findOne({email:adminemail})
+
+  // admin.Wallet-=booking.Total
+  // await admin.save()
+
   await user.save()
+
+  const walletHistoryEntry = new Wallet({
+    userId: userId,
+    amount: booking.Total,
+    reason: "Booking cancelled",
+    type: "Credit",
+  });
+
+  await walletHistoryEntry.save()
+
+
   res.json({ success: true })
 }
 
@@ -301,33 +393,91 @@ const reportProvider = async (req, res) => {
 
     const b = await report.save()
     console.log(b, ")))))))))))))00")
-    res.json({message:"success",b})
+    res.json({ message: "success", b })
   } catch (error) {
     console.log(error.message)
   }
 
 }
 
-const getAddress=async(req,res)=>{
-  const {id}=req.params
+const getAddress = async (req, res) => {
+  const { id } = req.params
 
   try {
-    // Fetch the user by ID and return their addresses
+ 
     const user = await User.findById(id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const addresses = user.addresses; 
+    const addresses = user.addresses;
 
-    res.json({message:"success",addresses});
+    res.json({ message: "success", addresses });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Internal server error' });
   }
 
 }
+
+const addwishlist = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { serviceId } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+
+    if (user.wishlist.includes(serviceId)) {
+      return res.status(400).json({ message: 'Service is already in the wishlist' });
+    }
+
+    user.wishlist.push(serviceId);
+    await user.save();
+
+    return res.status(200).json({ message: 'Service added to the wishlist' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+const getWishlist = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId).populate('wishlist');
+    console.log(user.wishlist, "#########################################################")
+    res.json(user.wishlist);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching wishlist items' });
+  }
+}
+
+
+const WalletHistory = async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+ 
+    const walletHistory = await Wallet.find({ userId });
+
+
+    res.status(200).json(walletHistory);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Failed to fetch wallet history' });
+  }
+
+}
+
+
 
 export {
   registerUser,
@@ -346,6 +496,10 @@ export {
   getBookings,
   userBookings,
   canceluser,
-  reportProvider
+  reportProvider,
+  addwishlist,
+  getWishlist,
+  WalletHistory,
+  verifyGoogle
 
 }

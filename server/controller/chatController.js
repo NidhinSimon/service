@@ -82,16 +82,31 @@ import User from "../models/userModel.js";
 
 
 const createChat = async (req, res) => {
-    const newChat = new Chat({
-        members: [req.body.senderId, req.body.receiverId]
-    })
+    const { userId, providerId } = req.body;
+  
     try {
-        const result = await newChat.save()
-        res.json(result)
+      // Check if a chat already exists between the given members (userId and providerId)
+      const existingChat = await Chat.findOne({
+        members: { $all: [userId, providerId] },
+      });
+  
+      if (existingChat) {
+        // If a chat already exists, return its information
+        res.json(existingChat);
+      } else {
+        // Create a new chat if it doesn't exist
+        const newChat = new Chat({
+          members: [userId, providerId],
+        });
+        const result = await newChat.save();
+        res.json(result);
+      }
     } catch (error) {
-        console.log(error.message)
+      console.error(error.message);
+      res.status(500).json({ message: "Chat creation failed" });
     }
-}
+  };
+  
 
 
 const userChat = async (req, res) => {

@@ -83,7 +83,18 @@ const Navbar = () => {
                 onClick={() => navigate("/users")}
                 href="#"
               >
-                USERS
+                Users
+              </a>
+              <a
+                className={`my-2 text-sm md:mx-4 md:my-0 ${
+                  location.pathname === "/dash"
+                    ? "text-blue-500"
+                    : "text-white"
+                }`}
+                onClick={() => navigate("/dash")}
+                href="#"
+              >
+                DashBoard
               </a>
               <a
                 className={`my-2 text-sm md:mx-4 md:my-0 ${

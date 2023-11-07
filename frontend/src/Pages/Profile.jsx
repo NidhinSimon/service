@@ -11,6 +11,7 @@ const Profile = () => {
   const [profile, setProfile] = useState([]);
   const [modal, showModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [walletHistory, setWalletHistory] = useState([]);
 
 
   const { id } = useParams();
@@ -20,6 +21,9 @@ const Profile = () => {
       const res = await axios.get(`http://localhost:5000/users/profile/${id}`);
       setProfile(res.data);
       console.log(res, ">>>>>>>>>>>>>>>>>>>>");
+
+      const walletHistoryRes = await axios.get(`http://localhost:5000/users/wallet-history/${id}`);
+      setWalletHistory(walletHistoryRes.data);
     };
     profileLoad();
   }, []);
@@ -58,7 +62,27 @@ const Profile = () => {
                   {profile.Wallet}
                 </span>
               </h1>
-
+              <div className="bg-slate-100 mt-5">
+      <div className="flex justify-between items-center">
+        <h1 className="text-black font-semibold ml-5 mt-4 text-lg">Wallet History</h1>
+      </div>
+      <div className="bg-slate-100 mt-4 h-64 rounded-xl flex flex-col items-center">
+      {walletHistory.map((item) => (
+          <div
+            key={item._id}
+            className={`bg-slate-100 w-80 h-24 mt-5 rounded-xl flex justify-center items-center ${
+              item.type === 'Credit' ? 'text-green-400' : 'text-red-600'
+            }`}
+          >
+            <h1 className="text-lg font-semibold">
+              <span className="text-blue-400">{item.reason} - </span>
+              {item.type === 'Credit' ? 'Credit' : 'Debit'} -{' '}
+              <span className="text-indigo-600">{item.amount} INR</span>
+            </h1>
+          </div>
+        ))}
+      </div>
+    </div>
             </div>
           </div>
           <div className="bg-slate-200 h-36 w-full md:h-80 rounded-3xl mt-5">

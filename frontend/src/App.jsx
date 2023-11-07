@@ -38,21 +38,19 @@ import UpcomingBookings from "./components/Employee/UpcomingBookings";
 import AllBookings from "./components/Employee/AllBookings";
 import UserBookings from "./components/USer/UserBookings";
 import Wishlist from "./components/USer/Wishlist";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-import ChatProvider from "./Context/ChatProvider";
 import Chats from "./components/USer/USerModal/Chat";
 import Chat from "./components/Employee/EmpChat/CHat";
+import Invoice from "./Pages/Invoice";
 
 function App() {
   return (
-    <ChatProvider  >
-
-
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <PrimeReactProvider>
         <Router>
           <Routes>
-            <Route path="/login" element={<LoginScreen />} />
+            <Route path="/login" index={true} element={<LoginScreen />} />
             <Route path="/register" element={<RegisterScree />} />
             <Route path="/map" element={<MapWithGeocoding />} />
             <Route path="/ji" element={<Juju />} />
@@ -71,8 +69,7 @@ function App() {
             <Route path="/bookings" element={<UserBookings />} />
             <Route path="/empbookings" element={<Bookings />} />
 
-
-            <Route path='/wishlist' element={<Wishlist/>}/>
+            <Route path="/wishlist" element={<Wishlist />} />
 
             <Route path="" element={<PrivateRoute />}>
               <Route path="/profile/:id" element={<Profile />} />
@@ -80,18 +77,16 @@ function App() {
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/service/:id" element={<ServiceDetailpage />} />
 
+              <Route path="/userChat" element={<Chats />} />
 
-              <Route path="/userChat" element={<Chats/>}/>
+              <Route path="/chat" element={<Chat />} />
 
-
-<Route path='/chat' element={<Chat/>}/>
-
+              <Route path="/invoice" element={<Invoice />} />
             </Route>
           </Routes>
         </Router>
       </PrimeReactProvider>
     </LocalizationProvider>
-    </ChatProvider>
   );
 }
 

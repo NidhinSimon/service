@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+
 import { button } from "@material-tailwind/react";
 
 import { Sidebar } from "primereact/sidebar";
 
 import { Button } from "primereact/button";
+import { FaHeart } from "react-icons/fa";
 
 import Cart from "./Cart";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +17,7 @@ import Swal from "sweetalert2";
 import UserNav from "./UserNav";
 import { addToCart } from "../slices/userSlice";
 import { useAddCartMutation } from "../slices/backendSlice";
+import toast,{Toaster} from 'react-hot-toast'
 
 const ServiceDetail = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(true);
@@ -34,7 +37,7 @@ const ServiceDetail = () => {
 
   const { userInfo } = useSelector((state) => state.user);
 
-  const userid = userInfo.userExists._id;
+  const userId = userInfo.userExists._id;
   useEffect(() => {
     const storedCoupon = localStorage.getItem("selectedCoupon");
     if (storedCoupon) {
@@ -42,7 +45,7 @@ const ServiceDetail = () => {
     }
   }, []);
 
-  console.log(userid, ">>>>>>>>>>>>>");
+  console.log(userId, ">>>>>>>>>>>>>");
 
   useEffect(() => {
     const coupon = async () => {
@@ -55,12 +58,12 @@ const ServiceDetail = () => {
 
   useEffect(() => {
     const cartfetch = async () => {
-      const res = await axios.get(`http://localhost:5000/users/cart/${userid}`);
+      const res = await axios.get(`http://localhost:5000/users/cart/${userId}`);
       setCart(res.data);
       console.log(res);
     };
     cartfetch();
-  }, [userid]);
+  }, [userId]);
 
   useEffect(() => {
     const servicesFetch = async () => {
@@ -80,14 +83,14 @@ const ServiceDetail = () => {
 
   const dispatch = useDispatch();
 
-  const handleBook = async (service, userid) => {
+  const handleBook = async (service, userId) => {
     // dispatch(addToCart(service));
     const cartData = {
       name: service.title,
       price: service.price,
       serviceId: service._id,
     };
-    const res = await add({ cartData, userid }).unwrap();
+    const res = await add({ cartData, userId }).unwrap();
     setCart((prevCart) => [...prevCart, cartData]);
     Swal.fire({
       title: "Item Added to Cart",
@@ -98,11 +101,45 @@ const ServiceDetail = () => {
     console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>>>");
   };
 
+  const handleAddToWishlist = async (serviceId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/users/wishlist/add/${userId}`,
+        {
+          serviceId,
+        }
+      );
+  
+      if (response.status === 200) {
+        Swal.fire({
+          icon: 'success',
+          title: 'Added to Wishlist',
+          text: 'The service has been added to your wishlist.',
+        });
+      } else if (response.status === 400) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Already in Wishlist',
+          text: 'This service is already in your wishlist.',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Failed to Add',
+          text: 'Failed to add the service to your wishlist.',
+        });
+      }
+    } catch (error) {
+      console.error("Error adding service to wishlist:", error);
+    }
+  };
+  
+
   const handleRemove = async (item) => {
     // dispatch(removeFromCart(item));
 
     await axios.delete(
-      `http://localhost:5000/users/cart/${userid}/${item.serviceId}`
+      `http://localhost:5000/users/cart/${userId}/${item.serviceId}`
     );
     const updatedcart = cart.filter((i) => i.serviceId !== item.serviceId);
     setCart(updatedcart);
@@ -149,10 +186,10 @@ const ServiceDetail = () => {
   const handleSortingOptionChange = (e) => {
     const selectedOption = e.target.value;
     setSelectedSortingOption(selectedOption);
-    // You can sort the services here based on the selectedOption and update the services state.
+   
   };
 
-  // Sort the services based on the selectedSortingOption
+
   const sortedServices = services.slice().sort((a, b) => {
     if (selectedSortingOption === "Low to High") {
       return a.price - b.price;
@@ -178,7 +215,7 @@ const ServiceDetail = () => {
   return (
     <>
       <UserNav />
-
+<Toaster/>
       <div className="">
         <div className="bg-slate-100  h-screen w-full">
           <div className="bg-gradient-to-tl from-blue-200 to-blue-400  border drop-shadow  w-full h-48">
@@ -240,6 +277,7 @@ const ServiceDetail = () => {
                   </select>
                 </div>
               </div>
+
               <div className="w-full h-screen">
                 <div className="w-full h-full md:flex">
                   <div className="w-full  md:w-4/6 ">
@@ -262,6 +300,14 @@ const ServiceDetail = () => {
                                   alt="Movie"
                                 />
                               </figure>
+
+                              <FaHeart
+                                onClick={() => handleAddToWishlist(service._id)}
+                                className={
+                                  `text-red-600 z-40 text-2xl absolute top-2 right-2 cursor-pointer `
+                                  // ${service.isInWishlist ? 'filled' : 'empty'}`
+                                }
+                              />
                               <div className="card-body">
                                 <h2 className="card-title ">{service.title}</h2>
 
@@ -273,7 +319,7 @@ const ServiceDetail = () => {
                                 <div className="card-actions align-middle justify-end">
                                   <button
                                     className="btn btn-primary  text-white text-xs lg:w-28  sm:w-16 md:w-20   "
-                                    onClick={() => handleBook(service, userid)}
+                                    onClick={() => handleBook(service, userId)}
                                   >
                                     BOOK NOW
                                   </button>

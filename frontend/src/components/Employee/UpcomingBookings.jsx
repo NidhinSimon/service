@@ -2,20 +2,25 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import Spinner from "./Spinner";
-import { AddressAutofill } from "@mapbox/search-js-react";
-import Booking from "../../../../server/models/BookingModel";
-import toast, { Toaster } from "react-hot-toast";
+
 import io from "socket.io-client";
+import OtpModal from "./EmpOptModal/OtpModal";
+import toast,{Toaster} from 'react-hot-toast'
 
 const UpcomingBookings = () => {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null); // State for error handling
+  const [error, setError] = useState(null);
+  const [id, setId] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal open state
+
+  const [otp, setOtp] = useState("");
 
   const { providerInfo } = useSelector((state) => state.employee);
   const providerId = providerInfo.provider._id;
 
-  const socket = io('http://localhost:5000'); // Connect to your server's socket.io
+  const socket = io("http://localhost:5000");
 
   useEffect(() => {
     axios
@@ -23,7 +28,10 @@ const UpcomingBookings = () => {
       .then((response) => {
         const data = response.data;
         console.log(data, ">");
-        setUpcomingBookings(data);
+        const pendingBookings = data.filter(
+          (booking) => booking.workStatus === "pending"
+        );
+        setUpcomingBookings(pendingBookings);
         setLoading(false);
       })
       .catch((error) => {
@@ -32,38 +40,71 @@ const UpcomingBookings = () => {
         setLoading(false);
       });
 
-    // Listen for real-time updates
-    socket.on('updatedBookings', (updatedBookings) => {
+    socket.on("bookingAccepted", (bookingId) => {
+   
+      const updatedBookings = upcomingBookings.map((booking) => {
+        if (booking._id === bookingId) {
+          return { ...booking, status: "accepted" };
+        }
+        return booking;
+      });
       setUpcomingBookings(updatedBookings);
     });
-  }, [providerId, socket]);
 
+    socket.on("newBooking", (newBooking) => {
+     
+      if (newBooking.status === "pending") {
+        setUpcomingBookings([...upcomingBookings, newBooking]);
+      }
+    });
+
+    return () => {
+      
+      socket.disconnect();
+    };
+  }, [providerId, upcomingBookings]);
   const handleCancel = async (bookingId) => {
     try {
-      console.log(bookingId, "...");
-      const response = await axios.post(
-        `http://localhost:5000/cancel/${bookingId}`
-      );
-      console.log(response, ">>>>>>>>>>>>>");
+      const response = await axios.post(`http://localhost:5000/cancel/${bookingId}`);
       if (response.data.success) {
-        toast("Booking Cancelled Successfully", {
-          icon: "👏",
-          style: {
-            borderRadius: "10px",
-            background: "#333",
-            color: "#fff",
-          },
-        });
-        const updatedBookings = upcomingBookings.filter(
-          (booking) => booking._id !== bookingId
-        );
+        const updatedBookings = upcomingBookings.filter((booking) => booking._id !== bookingId);
         setUpcomingBookings(updatedBookings);
+  
+      
+        toast.success("Booking canceled successfully");
 
+        console.log("Booking canceled successfully");
+      } else {
+   
+        console.error("Booking cancellation failed");
       }
     } catch (error) {
       console.error("Error canceling booking:", error);
-      setError("Failed to cancel the booking. Please try again later.");
+
     }
+  };
+  
+  const isBookingToday = (bookingDate) => {
+    const currentDate = new Date();
+    const bookingDateTime = new Date(bookingDate);
+    return (
+      bookingDateTime.getDate() === currentDate.getDate() &&
+      bookingDateTime.getMonth() === currentDate.getMonth() &&
+      bookingDateTime.getFullYear() === currentDate.getFullYear()
+    );
+  };
+
+  const confirmBlock = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancelmodal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleOpen = (id) => {
+    setIsModalOpen(true);
+    setId(id);
   };
 
   return (
@@ -78,11 +119,14 @@ const UpcomingBookings = () => {
         <ul className="space-y-4">
           {upcomingBookings.length === 0 ? (
             <p className="text-lg text-gray-600">
-              No upcoming bookings at the moment.
+              No upcoming bookings with pending work status at the moment.
             </p>
           ) : (
             upcomingBookings.map((booking) => (
-              <li key={booking.id} className="bg-gray-100 p-4 rounded-lg flex flex-col space-y-2">
+              <li
+                key={booking._id}
+                className="bg-gray-100 p-4 rounded-lg flex flex-col space-y-2"
+              >
                 <div className="flex justify-between items-center">
                   <div>
                     <p className="text-xl font-semibold text-indigo-600">
@@ -94,19 +138,36 @@ const UpcomingBookings = () => {
                     <p className="text-sm text-gray-500">
                       <strong>User:</strong> {booking.username}
                     </p>
-                    {booking.serviceName.map((service, index) => (
-                      <p key={index} className="text-xl font-semibold text-indigo-600">
-                        {service}
-                      </p>
-                    ))}
                   </div>
-                  <button
-                    onClick={() => handleCancel(booking._id)}
-                    className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none"
-                  >
-                    Cancel Booking
-                  </button>
+                  {isBookingToday(booking.date) ? (
+                    booking.workStatus === "accepted" ? (
+                      <p className="text-sm text-green-600">Booking is accepted</p>
+                    ) : (
+                      <button
+                        onClick={() => handleOpen(booking._id)}
+                        className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-700 focus:outline-none"
+                      >
+                        Accept Booking
+                      </button>
+                    )
+                  ) : (
+                    <button
+                      onClick={() => handleCancel(booking._id)}
+                      className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-700 focus:outline-none"
+                    >
+                      Cancel Booking
+                    </button>
+                  )}
                 </div>
+
+                {isModalOpen && (
+                  <OtpModal
+                    message="Please Enter the OTP from the User"
+                    onConfirm={confirmBlock}
+                    onClose={handleCancelmodal}
+                    bookingId={id}
+                  />
+                )}
               </li>
             ))
           )}

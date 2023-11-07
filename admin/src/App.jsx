@@ -18,6 +18,9 @@ import AllProviders from "./components/AllProviders";
 import CouponList from "./components/Pages/CouponList";
 
 import AdminReports from "./components/Pages/Report";
+import AdminDashboard from "./components/Dashboard/AdminDashboard";
+import Bar from "./components/Dashboard/BarChart";
+import PieChart from "./components/Dashboard/PieChart";
 
 function App() {
   return (
@@ -37,6 +40,9 @@ function App() {
             <Route path="/coupons" element={<CouponList />} />
 
             <Route path="/reports" element={<AdminReports />} />
+
+            <Route path="/dash" element={<AdminDashboard/>}/>
+            <Route path="/dashe" element={  <Bar />}/>
           </Routes>
         </Router>
       </PrimeReactProvider>

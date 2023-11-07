@@ -49,16 +49,28 @@ const io = new Server(server, {
 let activeUsers = []
 io.on("connection", (socket) => {
 
-  socket.join(`provider_${socket.id}`);
+
+  // socket.on('test',(data)=>{
+  //   console.log(data,"??????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????")
+  // })
+
+  // socket.join(`provider_${socket.id}`);
+
+
+
+
+
 
   socket.on('test-message', (data) => {
     console.log('Received test message from client:', data);
     socket.emit('test-message-response', 'Message received on the server');
 
   });
+
+  socket.emit("test","dkdkdkdkdkhd")
   socket.on('join-provider-room', (providerId) => {
     socket.join(`provider_${providerId}`);
-    console.log(`${providerId}dggdghdgdhgdhghdg`)
+    console.log(`${providerId} provider joined the room`)
   });
 
   socket.on("new-user-add", (newUserId) => {
@@ -102,7 +114,7 @@ io.on("connection", (socket) => {
 
   socket.on('disconnect', () => {
     activeUsers = activeUsers.filter((user) => user.socketId !== socket.id)
-    console.log("USer disconnected", activeUsers)
+   
     io.emit('get-users', activeUsers)
   });
 });
@@ -147,7 +159,33 @@ app.use(bookingRoute)
 
 
 
+app.get('/bookings-by-month', async (req, res) => {
+  try {
+    const pipeline = [
+      {
+        $group: {
+          _id: { month: { $month: { $dateFromString: { dateString: '$date' } } }, year: { $year: { $dateFromString: { dateString: '$date' } } } },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          month: '$_id.month',
+          year: '$_id.year',
+          count: 1,
+        },
+      },
+    ];
 
+    const bookingsByMonth = await Booking.aggregate(pipeline);
+
+    res.json(bookingsByMonth);
+  } catch (error) {
+    console.error('Error fetching booking data: ', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // app.post('/checkout', async (req, res) => {
 //   console.log('inside checkout route');

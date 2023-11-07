@@ -7,12 +7,7 @@ import UserNav from "./UserNav";
 const UserHome = () => {
   const { userInfo } = useSelector((state) => state.user);
 
-
-
-
   const [categories, setCategories] = useState([]);
-
-
 
   const navigate = useNavigate();
 
@@ -36,7 +31,7 @@ const UserHome = () => {
   return (
     <>
       <header className="bg-white rounded-3xl">
-      <UserNav/>
+        <UserNav />
 
         <div className="container px-6 py-16 mx-auto h-screen ">
           <div className="items-center lg:flex">

@@ -5,6 +5,9 @@ import User from '../models/userModel.js'
 import cloudinary from 'cloudinary'
 import { generateAdminToken } from "../utils/generateToke.js"
 import Report from "../models/ReportModel.js"
+import Booking from "../models/BookingModel.js"
+import Provider from "../models/providerModel.js"
+
 const adminLogin = async (req, res) => {
 
     const { email, password } = req.body
@@ -170,6 +173,60 @@ const rejectReport = async (req, res) => {
     }
 }
 
+const getStats = async (req, res) => {
+    try {
+      const totalUsers = await User.countDocuments();
+      
+
+      const totalEarnings = await Booking.aggregate([
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: '$Total' }, 
+          },
+        },
+      ]);
+
+      const totalProviders=await Provider.countDocuments()
+
+      const totalBookings=await Booking.countDocuments()
+  
+      res.json({
+        totalUsers,
+        totalProviders,
+        totalBookings,
+        totalEarnings: totalEarnings.length > 0 ? totalEarnings[0].totalAmount : 0,
+      });
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+      res.status(500).json({ error: 'An error occurred while fetching data' });
+    }
+  };
+
+  const getMonths = async (req, res) => {
+    try {
+      const bookings = await Booking.find();
+     
+      res.json(bookings);
+    } catch (error) {
+      console.error('Error fetching bookings:', error);
+      res.status(500).json({ error: 'Failed to fetch bookings' });
+    }
+  }
+  
+
+  const Earnings=async(req,res)=>{
+    console.log("ddugdgdgh")
+    try {
+        const adminemail=process.env.ADMIN_EMAIL
+        const adminData = await admin.findOne({ email:adminemail}); // Replace with the actual admin email
+        res.json({ earnings: adminData.Wallet });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+      }
+  }
+  
 
 export {
     adminLogin,
@@ -181,5 +238,8 @@ export {
     blockUser,
     unBlockUser,
     getReports,
-    rejectReport
+    rejectReport,
+    getStats,
+    getMonths,
+    Earnings
 }

@@ -16,7 +16,7 @@ const booking = new mongoose.Schema({
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Service'
             },
-           
+
 
 
         }
@@ -61,6 +61,9 @@ const booking = new mongoose.Schema({
         type: String,
         enum: ['pending', 'completed'],
         default: 'pending',
+    },
+    otp:{
+        type:String,
     },
     providersReceived: [
         {

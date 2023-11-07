@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import { ChatState } from "../../../Context/ChatProvider";
+
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { userChats } from "../../../api/chatRequest";
@@ -21,6 +21,8 @@ const Chat = () => {
   const [receiveMessage, setreceiveMessage] = useState(null);
   const socket = useRef();
   const scroll=useRef()
+  const [unreadMessages, setUnreadMessages] = useState({});
+
 
   console.log(chats, ">>");
   useEffect(() => {

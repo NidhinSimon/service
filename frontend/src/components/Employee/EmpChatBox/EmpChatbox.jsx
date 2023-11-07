@@ -3,7 +3,7 @@ import { getuserData } from "../../../api/chatRequest";
 import { Avatar } from "flowbite-react";
 import { useFetcher } from "react-router-dom";
 import { addMessage, getMessages } from "../../../api/messageRequest";
-
+import {format} from 'timeago.js'
 const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
   const [userData, setuserData] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -96,6 +96,9 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
                     }
                   >
                     <div className="chat-bubble">{m.text}</div>
+                    <time className="text-xs opacity-50">
+    {format(m.createdAt)} 
+  </time>
                   </div>
                 </>
               ))}
