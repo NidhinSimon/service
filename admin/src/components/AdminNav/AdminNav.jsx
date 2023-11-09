@@ -15,8 +15,8 @@ const AdminNav = () => {
     if (res.data.message === "Logged Out") {
       navigate("/login");
       localStorage.removeItem("adminInfo");
-
-      toast.success("succesd fully sjjs");
+ 
+    
     }
   };
 

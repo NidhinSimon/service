@@ -17,7 +17,7 @@ const couponadd = async (req, res) => {
         const expiresIn = new Date();
         expiresIn.setDate(expiresIn.getDate() + 30);
 
-        const couponcreate = await Coupon.create({
+        await Coupon.create({
             couponName,
             discount,
             expiresIn
@@ -33,7 +33,7 @@ const couponadd = async (req, res) => {
 
 const getcoupon = async (req, res) => {
     const coupons = await Coupon.find()
-    console.log(coupons)
+  
     res.json(coupons)
 }
 
@@ -45,7 +45,7 @@ const editcoupon = async (req, res) => {
     res.json(coupon)
 }
 
-const editableCoupon = async (req, res) => {
+const editableCoupon = async (req, ) => {
     const { id } = req.params
     console.log(req.body)
     console.log(id, "9999")

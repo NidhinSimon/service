@@ -28,10 +28,10 @@ const Chatbox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
   }, [chat, currentUser]);
 
   useEffect(() => {
-    if (receiveMessage !== null && receiveMessage.chatId === chat?._id) {
-      setMessages([...messages, receiveMessage]);
+    if (receiveMessage !== null && receiveMessage.chatId === chat._id) {
+      setMessages([...messages, { ...receiveMessage, isRead: false }]);
     }
-  }, [receiveMessage]);
+  }, [receiveMessage,chat._id]);
 
   useEffect(() => {
     const fetchMessage = async () => {

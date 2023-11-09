@@ -8,18 +8,12 @@ import cloudinary from 'cloudinary';
 import serviceRoute from './routes/providerRoute.js';
 import cookieParser from 'cookie-parser';
 import { Server } from "socket.io";
-import Stripe from 'stripe';
-import getRawBody from 'raw-body';
+
+
 import Booking from './models/BookingModel.js';
-import Service from './models/serviceModel.js';
-import category from './models/CategoryModel.js';
-import Provider from './models/providerModel.js';
-import geolib from 'geolib'
-import Request from './models/RequestModel.js';
-import { acceptBooking } from './controller/providerController.js';
+
 import { init } from './controller/providerController.js';
-import cron from 'node-cron'
-import User from './models/userModel.js';
+
 import chatRoute from './routes/chatRoute.js';
 import messageRouter from './routes/MessgaeRoute.js';
 import bookingRoute from './routes/bookingRoute.js';
@@ -124,7 +118,6 @@ io.on("connection", (socket) => {
 init(io)
 hai(io)
 
-const stripe = new Stripe(process.env.SECRET_STRIPE_KEY);
 
 // app.use(express.json());
 

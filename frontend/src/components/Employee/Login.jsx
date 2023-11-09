@@ -82,7 +82,7 @@ const Login = () => {
         }
       })
       .catch((error) => {
-        console.error("OTP Verification Error:", error);
+        toast.error("OTP Verification Error:", error);
     
       });
   };

@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
-const {nextui} = require("@nextui-org/theme");
+import daisyui from 'daisyui'
+import flowbite from 'flowbite/plugin'
 export default {
 
   content: [
@@ -26,8 +27,8 @@ export default {
   darkMode: "class",
  
   plugins: [
-    require('daisyui'),
-    require('flowbite/plugin'),
+    daisyui,
+    flowbite
    
 
   ],

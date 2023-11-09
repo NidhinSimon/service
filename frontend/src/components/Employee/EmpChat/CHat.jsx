@@ -24,11 +24,8 @@ const Chat = () => {
   const [online, setOnline] = useState(null);
   const [sendMessage, setsendMessage] = useState(null);
   const [receiveMessage, setreceiveMessage] = useState(null);
+    const [unreadMessages, setUnreadMessages] = useState({});
   const socket = useRef();
-
-  const [notifications, setNotifications] = useState([]);
-
-  
 
   console.log(chats, ">>");
   useEffect(() => {
@@ -58,14 +55,25 @@ const Chat = () => {
     socket.current.on("receive-message", (data) => {
       console.log("datataata", data);
       setreceiveMessage(data);
+      setUnreadMessages((prevUnreadMessages) => {
+        const updatedUnreadMessages = { ...prevUnreadMessages };
+        updatedUnreadMessages[data.chatId] = true;
+        return updatedUnreadMessages;
+      });
     });
   }, []);
 
-  const handlesend=async(chat,notification)=>{
-    console.log(chat)
+  const handleui=(chat)=>{
 setcurrentchat(chat)
 
+setUnreadMessages((prevUnreadMessages) => {
+  const updatedUnreadMessages = { ...prevUnreadMessages };
+  updatedUnreadMessages[chat._id] = false;
+  return updatedUnreadMessages;
+});
+
   }
+
 
   
 
@@ -78,14 +86,11 @@ setcurrentchat(chat)
 <div className="w-1/4 bg-yellow-100 border-r p-4">
   <div className="friends-list">
     <h1 className="font-semibold">Your Conversations</h1>
-    {chats.map((chat) => {
-              const notification = receiveMessage !== null && receiveMessage.chatId === chat._id;
-              return (
-                <div key={chat._id} className="mt-10" onClick={() => handlesend(chat,notification)}>
-                  <EmpConversation data={chat} currentUser={providerId} notification={notification} />
-                </div>
-              );
-            })}
+    {chats.map((chat) => (
+      <div key={chat._id} className="mt-10" onClick={() => handleui(chat)}>
+        <EmpConversation data={chat} currentUser={providerId} receiveMessage={receiveMessage}   unread={unreadMessages[chat._id]} />
+      </div>
+    ))}
   </div>
 </div>
 

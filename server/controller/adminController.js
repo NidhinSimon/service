@@ -1,4 +1,4 @@
-import category from "../models/CategoryModel.js"
+
 import admin from "../models/adminModel.js"
 import Service from "../models/serviceModel.js"
 import User from '../models/userModel.js'

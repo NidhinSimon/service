@@ -1,28 +1,33 @@
 import React, { useState, useEffect } from "react";
-import Navbar from "../Navbar";
+
 import { Chart as ChartJS } from "chart.js";
-import { Line } from "react-chartjs-2";
+
 import { Tooltip, Title, ArcElement, Legend } from "chart.js";
-import Bar from "./BarChart";
+
 import PieChart from "./PieChart";
 import AdminNav from "../AdminNav/AdminNav";
-import {useNavigate} from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 ChartJS.register(Tooltip, Title, ArcElement, Legend);
 
-
 const AdminDashboard = () => {
-
   const navigate = useNavigate();
- 
+  const { adminInfo } = useSelector((state) => state.admin);
+
+  useEffect(() => {
+    if (adminInfo) {
+      navigate("/dash");
+    } else {
+      navigate("/login");
+    }
+  }, []);
+
   const [adminStats, setAdminStats] = useState({
     totalUsers: 0,
     totalEarnings: 0,
   });
 
-
   useEffect(() => {
- 
     fetch("http://localhost:7000/admin/stats")
       .then((response) => response.json())
       .then((data) => setAdminStats(data))
@@ -52,34 +57,50 @@ const AdminDashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-white p-4 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-2 flex justify-center">Total Bookings</h2>
-              <p className="flex justify-center text-xl font-semibold">{adminStats.totalBookings}</p>
+              <h2 className="text-xl font-semibold mb-2 flex justify-center">
+                Total Bookings
+              </h2>
+              <p className="flex justify-center text-xl font-semibold">
+                {adminStats.totalBookings}
+              </p>
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-2 flex justify-center">Users</h2>
-              <p className="flex justify-center text-xl font-semibold">{adminStats.totalUsers}</p>
+              <h2 className="text-xl font-semibold mb-2 flex justify-center">
+                Users
+              </h2>
+              <p className="flex justify-center text-xl font-semibold">
+                {adminStats.totalUsers}
+              </p>
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-2 flex justify-center">Booking Total </h2>
-              <p className="flex justify-center text-xl font-semibold">₹{adminStats.totalEarnings}</p>
+              <h2 className="text-xl font-semibold mb-2 flex justify-center">
+                Booking Total{" "}
+              </h2>
+              <p className="flex justify-center text-xl font-semibold">
+                ₹{adminStats.totalEarnings}
+              </p>
             </div>
 
             <div className="bg-white p-4 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-2 flex justify-center">Providers</h2>
-              <p className="flex justify-center text-xl font-semibold">{adminStats.totalProviders}</p>
+              <h2 className="text-xl font-semibold mb-2 flex justify-center">
+                Providers
+              </h2>
+              <p className="flex justify-center text-xl font-semibold">
+                {adminStats.totalProviders}
+              </p>
             </div>
           </div>
 
           <div className="bg-white p-4 rounded-lg shadow mt-4  h-screen">
             <h2 className="text-xl font-semibold mb-2">Booking Chart</h2>
-            <div className="flex justify-center items-center h-full w-full" style={{width:"100%",height:"400px"}}>
-            
-              <PieChart  /> 
+            <div
+              className="flex justify-center items-center h-full w-full"
+              style={{ width: "100%", height: "400px" }}
+            >
+              <PieChart />
             </div>
-
-          
           </div>
         </div>
       </div>

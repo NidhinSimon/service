@@ -19,6 +19,7 @@ const Chat = () => {
   const [online, setOnline] = useState(null);
   const [sendMessage, setsendMessage] = useState(null);
   const [receiveMessage, setreceiveMessage] = useState(null);
+  
   const socket = useRef();
   const scroll=useRef()
   const [unreadMessages, setUnreadMessages] = useState({});
@@ -52,8 +53,25 @@ const Chat = () => {
     socket.current.on("receive-message", (data) => {
       console.log("datataata", data);
       setreceiveMessage(data);
+      setUnreadMessages((prevUnreadMessages) => {
+        const updatedUnreadMessages = { ...prevUnreadMessages };
+        updatedUnreadMessages[data.chatId] = true;
+        return updatedUnreadMessages;
+      });
     });
   }, []);
+
+
+  const handleui=(chat)=>{
+    setcurrentchat(chat)
+    
+    setUnreadMessages((prevUnreadMessages) => {
+      const updatedUnreadMessages = { ...prevUnreadMessages };
+      updatedUnreadMessages[chat._id] = false;
+      return updatedUnreadMessages;
+    });
+    
+      }
 
   return (
     <>
@@ -66,8 +84,8 @@ const Chat = () => {
   <div className="friends-list">
     <h1 className="font-semibold">Your Conversations</h1>
     {chats.map((chat) => (
-      <div key={chat._id} className="mt-10" onClick={() => setcurrentchat(chat)}>
-        <Conversations data={chat} currentUser={userId} />
+      <div key={chat._id} className="mt-10" onClick={() => handleui(chat)}>
+        <Conversations data={chat} currentUser={userId} receiveMessage={receiveMessage}   unread={unreadMessages[chat._id]} />
       </div>
     ))}
   </div>
@@ -82,7 +100,7 @@ const Chat = () => {
       receiveMessage={receiveMessage}
     />
   ) : (
-    <div className="mt-10 text-center">Select a conversation to start chatting.</div>
+    <div className="mt-10 text-center ">Select a conversation to start chatting.</div>
   )}
 </div>
 

@@ -1,4 +1,4 @@
-import { json } from "express";
+
 import User from "../models/userModel.js";
 import { generateToken } from "../utils/generateToke.js";
 import Service from "../models/serviceModel.js";
@@ -7,7 +7,6 @@ import Booking from "../models/BookingModel.js";
 import Provider from "../models/providerModel.js";
 import Report from "../models/ReportModel.js";
 
-import Admin from "../models/adminModel.js";
 import Wallet from '../models/wallerHistoryModal.js'
 
 const registerUser = async (req, res) => {

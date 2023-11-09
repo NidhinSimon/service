@@ -2,7 +2,7 @@ import Provider from "../models/providerModel.js";
 import cloudinary from 'cloudinary'
 import nodemailer from 'nodemailer';
 import User from "../models/userModel.js";
-import Request from "../models/RequestModel.js";
+
 import Booking from "../models/BookingModel.js";
 import Service from "../models/serviceModel.js";
 
@@ -285,8 +285,6 @@ const getUpcoming = async (req, res) => {
 console.log(id,"_------------------")
     try {
         
-        const currentDate = new Date();
-
        
         const upcoming = await Booking.find({
             provider: id, 
@@ -330,7 +328,7 @@ const cancelBooking = async (req, res) => {
         const user = booking.userId;
         const userId = await User.findById(user);
         userId.Wallet += booking.Total;
-        const updatedUser = await userId.save();
+      await userId.save();
 
 
         const walletHistoryEntry = new WalletHistory({

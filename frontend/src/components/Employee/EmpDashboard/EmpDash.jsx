@@ -20,6 +20,9 @@ useEffect(()=>{
     if(providerInfo)
     {
         navigate('/empDash')
+    }else
+    {
+      navigate('/emplogin')
     }
    
 

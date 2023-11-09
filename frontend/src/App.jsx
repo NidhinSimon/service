@@ -82,16 +82,17 @@ function App() {
             {/* Emp Public Route  */}
 
             <Route path="/emplogin" element={<Login />} />
-            <Route path="/empbookings" element={<Bookings />} />
-          
-            <Route path="/provider/upcoming" element={<UpcomingBookings />} />
-            <Route path="/provider/all" element={<AllBookings />} />
-            <Route path="/chat" element={<Chat />} />
+         
 
             {/* Emp private Route  */}
             <Route path="" element={<EmpPrivateRoute />}>
               <Route path="/empDash" element={<EmpDash />} />
               <Route path="/empHome" element={<EmpHome />} />
+              <Route path="/empbookings" element={<Bookings />} />
+          
+          <Route path="/provider/upcoming" element={<UpcomingBookings />} />
+          <Route path="/provider/all" element={<AllBookings />} />
+          <Route path="/chat" element={<Chat />} />
             </Route>
           </Routes>
         </Router>

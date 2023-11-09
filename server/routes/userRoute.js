@@ -25,7 +25,6 @@ import {
     verifyGoogle
 
 } from '../controller/userController.js'
-import { cancelBooking } from '../controller/providerController.js'
 
 
 router.post('/register', registerUser)

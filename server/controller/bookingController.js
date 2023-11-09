@@ -4,10 +4,10 @@ import Provider from '../models/providerModel.js';
 import Service from '../models/serviceModel.js';
 
 import geolib from 'geolib'
-import { acceptBooking } from './providerController.js';
+
 import cron from 'node-cron'
 import User from '../models/userModel.js';
-import { transferToAdminWallet } from '../utils/transferToAdminWallet.js';
+
 import otpGenerator from 'otp-generator'
 import handlebars from 'handlebars';
 import fs from 'fs';
@@ -17,7 +17,6 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
 
-import { reduceFromAdminWallet } from '../utils/transferToAdminWallet.js';
 
 import WalletHistory from '../models/wallerHistoryModal.js'
 
@@ -34,13 +33,13 @@ export const hai = (i) => {
 }
 
 
-const createOrder = async (customer, data, io, res, session) => {
+const createOrder = async (customer, data, io,  ) => {
     if (customer && customer.metadata && customer.metadata.cart) {
         try {
             const items = JSON.parse(customer.metadata.cart);
 
             const serviceNames = items.map(item => item.name);
-            const otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false, specialChars: false, upperCase: false });
+            const otp = otpGenerator.generate(6, { digits: true, alphabets: false, upperCase: false, specialChars: false,   });
 
             console.log(otp, "~~~~~~~~~~~~~~~~~~~~~~~~~")
             // console.log(serviceNames, "~~~~~~~~~~~~~~~~~~~~~~~~~~~~+==============================================~~~")
