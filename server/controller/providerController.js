@@ -281,19 +281,19 @@ const acceptBooking = async (req, res) => {
 
 const getUpcoming = async (req, res) => {
     const { id } = req.params;
-    // console.log(id, '>>>>')
 
+console.log(id,"_------------------")
     try {
-        // Get the current date
+        
         const currentDate = new Date();
 
-        // Use the `find` method to retrieve upcoming bookings for the provider
+       
         const upcoming = await Booking.find({
-            provider: id, // Filter by provider ID
-            date: { $gte: currentDate }, // Filter for dates on or after the current date
+            provider: id, 
+        
             status: 'accepted',
         });
-        // console.log(upcoming, ">>>>>>")
+     
 
         res.json(upcoming);
     } catch (error) {
@@ -322,12 +322,11 @@ const cancelBooking = async (req, res) => {
     try {
         const { id } = req.params;
 
-        // Find the booking and update its status to 'canceled'
         const booking = await Booking.findByIdAndUpdate(id);
         booking.status = 'canceled';
         const updatedBooking = await booking.save();
 
-        // Find the associated user and update their Wallet
+      
         const user = booking.userId;
         const userId = await User.findById(user);
         userId.Wallet += booking.Total;
@@ -382,54 +381,95 @@ const completeBooking=async(req,res)=>{
     console.log(otp,">>>>>>>>>>>>>>>>>>",bookingId)
   
     try {
-        // Fetch booking and related data from the database
+        
         const booking = await Booking.findById(bookingId);
         console.log(booking, "....");
         const adminemail = process.env.ADMIN_EMAIL;
         const adminWallet = await Admin.findOne({ email: adminemail });
         const providerWallet = await Provider.findById(booking.provider);
 
-        // Check if OTP matches
-        // if (otp === booking.otp) {
-        // Calculate 10% of the booking amount
+    
+        if (otp === booking.otp) {
+
         const adminCut = booking.Total * 0.1;
         const providerCut = booking.Total - adminCut;
 
         console.log(adminCut, '----------------', providerCut);
 
-        // Update wallet balances
+
         adminWallet.Wallet += adminCut;
         providerWallet.Wallet += providerCut;
 
-        // Save wallet changes
+     
         const adminWalletSaved = await adminWallet.save();
         console.log(adminWalletSaved, "admin Wallet");
 
         const providerWalletSaved = await providerWallet.save();
         console.log(providerWalletSaved, "provider wallet");
 
-        // Mark the booking as completed or update its status
+   
         booking.workStatus = "completed";
         await booking.save();
 
         const walletHistoryEntry = new WalletHistory({
-            userId: booking.provider,
+            ProviderId: booking.provider,
             amount:providerCut,
+            reason:"Payment For the Service",
             type: "Credit",
         });
 
         await walletHistoryEntry.save()
 
         return res.json({ message: "OTP verified, funds transferred" });
-        // } else {
-        //   return res.status(400).json({ message: "Invalid OTP" });
-        // }
+        } else {
+          return res.status(400).json({ message: "Invalid OTP" });
+        }
 
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: "Server error" });
     }
 }
+
+
+
+const getallStats = async (req, res) => {
+    try {
+        const { id } = req.params;
+        console.log(id, "///");
+
+
+        const totalBookings = await Booking.countDocuments({ provider: id });
+
+
+        const completedBookings = await Booking.find({
+            $and: [{ provider: id }, { workStatus: 'completed' }],
+        });
+
+        let totalEarnings = 0;
+        for (const booking of completedBookings) {
+            totalEarnings += booking.Total;
+        }
+
+        console.log(totalBookings, "-----------------------", totalEarnings);
+
+        return res.json({
+            totalBookings,
+            totalEarnings,
+        });
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({ error: "An error occurred" });
+    }
+};
+
+
+const Logoutprovider=async(req,res)=>{
+    console.log("djdjd")
+res.json({message:"Logged Out Successfully"})
+}
+
+
 
 export {
     serviceName,
@@ -448,5 +488,7 @@ export {
     getUpcoming,
     getAllBookings,
     cancelBooking,
-    completeBooking
+    completeBooking,
+    getallStats,
+    Logoutprovider
 }

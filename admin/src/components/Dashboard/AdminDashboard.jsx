@@ -5,16 +5,24 @@ import { Line } from "react-chartjs-2";
 import { Tooltip, Title, ArcElement, Legend } from "chart.js";
 import Bar from "./BarChart";
 import PieChart from "./PieChart";
+import AdminNav from "../AdminNav/AdminNav";
+import {useNavigate} from 'react-router-dom'
+import { useSelector } from "react-redux";
 ChartJS.register(Tooltip, Title, ArcElement, Legend);
 
+
 const AdminDashboard = () => {
+
+  const navigate = useNavigate();
+ 
   const [adminStats, setAdminStats] = useState({
     totalUsers: 0,
     totalEarnings: 0,
   });
 
+
   useEffect(() => {
-    // Fetch admin statistics from the backend
+ 
     fetch("http://localhost:7000/admin/stats")
       .then((response) => response.json())
       .then((data) => setAdminStats(data))
@@ -37,7 +45,7 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <Navbar />
+      <AdminNav />
       <div className="bg-blue-300  ">
         <div className="container mx-auto p-4">
           <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>

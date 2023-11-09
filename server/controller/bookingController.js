@@ -9,6 +9,12 @@ import cron from 'node-cron'
 import User from '../models/userModel.js';
 import { transferToAdminWallet } from '../utils/transferToAdminWallet.js';
 import otpGenerator from 'otp-generator'
+import handlebars from 'handlebars';
+import fs from 'fs';
+import nodemailer from 'nodemailer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
 
 import { reduceFromAdminWallet } from '../utils/transferToAdminWallet.js';
@@ -58,9 +64,14 @@ const createOrder = async (customer, data, io, res, session) => {
 
 
             newOrder.status = 'pending';
-            newOrder.workStatus="pending"
+            newOrder.workStatus = "pending"
 
             const newBooking = await newOrder.save();
+
+
+         
+
+            sendInvoice(customer,newBooking);
 
 
 
@@ -141,6 +152,7 @@ const createOrder = async (customer, data, io, res, session) => {
                 }
             })
 
+
             console.log('Booking notifications sent to nearby providers');
         } catch (error) {
             console.log(error.message, "An error occurred in create order");
@@ -158,8 +170,8 @@ const updateUserwallet = async (userId, refund) => {
 
         const walletHistoryEntry = new WalletHistory({
             userId: userId,
-            amount:refund,
-            reason:"No Service Provider Found",
+            amount: refund,
+            reason: "No Service Provider Found",
             type: "Credit",
         });
 
@@ -197,7 +209,8 @@ export const checkoutController = async (req, res) => {
                 latitude: req.body.latitude,
                 longitude: req.body.longitude,
                 total: total,
-                name: req.body.name
+                name: req.body.name,
+                email:req.body.email
             },
         });
 
@@ -248,6 +261,7 @@ export const webhook = async (req, res) => {
             stripe.customers.retrieve(data.customer).then((customer) => {
 
                 createOrder(customer, data, io, res)
+                console.log(data, "-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------", customer)
             }).catch((err) => {
                 console.log(err.message, "______________-");
             });
@@ -258,4 +272,78 @@ export const webhook = async (req, res) => {
         console.log('Webhook Error:', err.message);
         res.status(400).send(`Webhook Error: ${err.message}`);
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const invoiceTemplatePath = path.join(__dirname, 'invoice.html');
+
+
+
+function sendInvoice(customer,newBooking) {
+
+    const generateInvoiceNumber = () => {
+        const prefix = 'INV'; 
+        const randomNumber = Math.floor(Math.random() * 1000000); 
+        return `${prefix}${randomNumber}`;
+      };
+    
+
+    const randomInvoiceNumber = generateInvoiceNumber();
+    console.log(randomInvoiceNumber);
+
+    const data = {
+        recipientName: customer.metadata.name,
+        invoiceNumber:randomInvoiceNumber,
+        amount:newBooking.Total,
+
+
+    };
+
+    const source = fs.readFileSync(invoiceTemplatePath, 'utf-8');
+    const invoiceTemplate = handlebars.compile(source);
+    const html = invoiceTemplate(data);
+    
+
+    console.log(html, "----------------------");
+    console.log(customer.metadata.email, "========================="); 
+
+    const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: {
+            user: process.env.NODE_MAIL,
+            pass: process.env.EMAIL_PASS,
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+
+    const mailOptions = {
+        from: process.env.NODE_MAIL,
+        to: customer.metadata.email, 
+        subject: 'Invoice ',
+        text: "Invoice Details",
+        html,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.log(error.message, "erroreeeeeeeeeee");
+        } else {
+            console.log("email Sent" + info.response);
+        }
+    });
 }

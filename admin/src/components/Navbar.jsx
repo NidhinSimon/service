@@ -16,11 +16,7 @@ const Navbar = () => {
         <nav className="container px-4 mx-auto md:flex md:justify-between md:items-center py-2">
           <div className="flex items-center justify-between">
             <a href="/">
-              <img
-                className="w-auto h-10 sm:h-12"
-                src="https://imgs.search.brave.com/XFUL8QZF7KnfxN5ci6odfH2chnPwJKce8iAk9btO_zg/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS12ZWN0b3Iv/YnJhbmRpbmctaWRl/bnRpdHytY29ycG9yLXZlY3Rvci1s/b2dvLWRlc2lnbl80/NjA4NDgtODcxNy5q/cGc_c2l6ZT02MjYm/ZXh0PWpwZw"
-                alt="Logo"
-              />
+              <img className="w-auto h-10 sm:h-12" src="" alt="Logo" />
             </a>
 
             <div className="flex md:hidden">
@@ -87,9 +83,7 @@ const Navbar = () => {
               </a>
               <a
                 className={`my-2 text-sm md:mx-4 md:my-0 ${
-                  location.pathname === "/dash"
-                    ? "text-blue-500"
-                    : "text-white"
+                  location.pathname === "/dash" ? "text-blue-500" : "text-white"
                 }`}
                 onClick={() => navigate("/dash")}
                 href="#"

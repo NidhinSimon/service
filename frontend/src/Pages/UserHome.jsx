@@ -6,10 +6,17 @@ import UserNav from "./UserNav";
 
 const UserHome = () => {
   const { userInfo } = useSelector((state) => state.user);
-
+console.log(userInfo,'>.............')
   const [categories, setCategories] = useState([]);
 
   const navigate = useNavigate();
+
+  useEffect(()=>{
+    if(userInfo)
+    {
+      navigate('/home')
+    }
+  },[,userInfo])
 
   useEffect(() => {
     axios

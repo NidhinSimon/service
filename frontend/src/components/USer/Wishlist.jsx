@@ -20,16 +20,7 @@ const Wishlist = () => {
       });
   }, [userId]);
 
-  const removeFromWishlist = (id) => {
-    axios
-      .delete(`/api/user/${userId}/wishlist/${id}`)
-      .then(() => {
-        setWishlist(wishlist.filter((item) => item._id !== id));
-      })
-      .catch((error) => {
-        console.error("Error removing item from wishlist:", error);
-      });
-  };
+
 
   const navigate = useNavigate();
 
@@ -74,12 +65,12 @@ const Wishlist = () => {
                 <p className="text-gray-600 text-base mb-2">₹{item.price}</p>
                 <p className="text-gray-600 text-base mb-2">{item.description}</p>
                 <div className="flex justify-between items-center">
-                  <button
+                  {/* <button
                     onClick={() => removeFromWishlist(item._id)}
                     className="text-white bg-red-500 hover:bg-red-600 py-2 px-3 rounded-full transition duration-300"
                   >
                     Remove
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => handleCheckout(item)}
                     className="text-white bg-blue-500 hover:bg-blue-600 py-2 px-3 rounded-full transition duration-300"

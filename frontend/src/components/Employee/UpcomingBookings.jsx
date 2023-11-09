@@ -28,10 +28,16 @@ const UpcomingBookings = () => {
       .then((response) => {
         const data = response.data;
         console.log(data, ">");
-        const pendingBookings = data.filter(
-          (booking) => booking.workStatus === "pending"
+        const acceptedBookings = data.filter(
+          (booking) => booking.status === "accepted"
         );
-        setUpcomingBookings(pendingBookings);
+        
+      
+        const upcomingBookingsFiltered = acceptedBookings.filter(
+          (booking) => booking.workStatus !== "completed"
+        );
+  
+        setUpcomingBookings(upcomingBookingsFiltered);
         setLoading(false);
       })
       .catch((error) => {
@@ -39,9 +45,8 @@ const UpcomingBookings = () => {
         setError("Failed to fetch upcoming bookings. Please try again later.");
         setLoading(false);
       });
-
+  
     socket.on("bookingAccepted", (bookingId) => {
-   
       const updatedBookings = upcomingBookings.map((booking) => {
         if (booking._id === bookingId) {
           return { ...booking, status: "accepted" };
@@ -50,19 +55,21 @@ const UpcomingBookings = () => {
       });
       setUpcomingBookings(updatedBookings);
     });
-
+  
     socket.on("newBooking", (newBooking) => {
-     
-      if (newBooking.status === "pending") {
+      if (newBooking.status === "accepted") {
         setUpcomingBookings([...upcomingBookings, newBooking]);
       }
     });
-
+  
     return () => {
-      
       socket.disconnect();
     };
   }, [providerId, upcomingBookings]);
+  
+
+
+  
   const handleCancel = async (bookingId) => {
     try {
       const response = await axios.post(`http://localhost:5000/cancel/${bookingId}`);
@@ -136,7 +143,10 @@ const UpcomingBookings = () => {
                       <strong>Date:</strong> {booking.date}
                     </p>
                     <p className="text-sm text-gray-500">
-                      <strong>User:</strong> {booking.username}
+                      <strong>Location:</strong> {booking.address}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      <strong>Amount:</strong> {booking.Total}
                     </p>
                   </div>
                   {isBookingToday(booking.date) ? (
@@ -147,7 +157,7 @@ const UpcomingBookings = () => {
                         onClick={() => handleOpen(booking._id)}
                         className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-700 focus:outline-none"
                       >
-                        Accept Booking
+                        Complete Booking
                       </button>
                     )
                   ) : (

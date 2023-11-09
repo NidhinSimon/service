@@ -24,6 +24,16 @@ const Login = () => {
   const [showrejectedModal, setShowrejectedModal] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const { providerInfo } = useSelector((state) => state.employee);
+  const providerId = providerInfo.provider._id;
+
+  useEffect(() => {
+    if (providerInfo) {
+      navigate("/empDash");
+    }
+  }, [navigate,providerInfo]);
+
+
   const dispatch = useDispatch();
   const onCaptchVerify = () => {
     const auth = getAuth();
@@ -52,7 +62,7 @@ const Login = () => {
         setOtppage(true);
       })
       .catch((error) => {
-        console.log(error);
+        toast.error(error.message);
       });
   };
 
@@ -65,10 +75,10 @@ const Login = () => {
 
         if (res.user) {
           console.log("OTP verified successfully");
-          navigate("/emphome");
+          navigate("/empDash");
         } else {
           console.log("OTP verification failed");
-          // toast.error("OTP verification failed");
+          toast.error("OTP verification failed");
         }
       })
       .catch((error) => {

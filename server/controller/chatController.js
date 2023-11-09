@@ -85,16 +85,16 @@ const createChat = async (req, res) => {
     const { userId, providerId } = req.body;
   
     try {
-      // Check if a chat already exists between the given members (userId and providerId)
+     
       const existingChat = await Chat.findOne({
         members: { $all: [userId, providerId] },
       });
   
       if (existingChat) {
-        // If a chat already exists, return its information
+       
         res.json(existingChat);
       } else {
-        // Create a new chat if it doesn't exist
+ 
         const newChat = new Chat({
           members: [userId, providerId],
         });

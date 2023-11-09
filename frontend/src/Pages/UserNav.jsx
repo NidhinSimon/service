@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLogoutMutation } from "../slices/backendSlice";
 import { useNavigate } from "react-router-dom";
 import { logout } from "../slices/userSlice";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
 const UserNav = () => {
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => {
@@ -23,24 +23,27 @@ const UserNav = () => {
     try {
       await logoutapi().unwrap();
       dispatch(logout());
-      
+
       navigate("/login");
-      
     } catch (error) {
-      console.log(error.message)
+      console.log(error.message);
     }
   };
 
   const handleProfile = async (id) => {
     console.log(id);
-    navigate(`/profile/${id}`)
+    navigate(`/profile/${id}`);
   };
 
   return (
     <nav className="container px-6 py-4 mx-auto md:flex md:justify-between md:items-center">
       <div className="flex items-center justify-between">
-        <a href="#" onClick={()=>navigate('/home')}>
-          <img className="w-auto h-10 sm:h-14" src="" alt="Logo" />
+        <a href="#" onClick={() => navigate("/home")}>
+          <img
+            className="w-auto h-14 sm:h-14"
+            src="/src/assets/final.png"
+            alt="Logo"
+          />
         </a>
 
         <div className="flex md:hidden">
@@ -99,14 +102,20 @@ const UserNav = () => {
           >
             Home
           </a>
-          <img  onClick={()=>navigate('/wishlist')} className="h-6 w-6" src="/src/assets/heart.gif" alt="eee" />
+          <img
+            onClick={() => navigate("/wishlist")}
+            className="h-6 w-6"
+            src="/src/assets/heart.gif"
+            alt="eee"
+          />
           {/* <a
             className="my-2 text-gray-700 transition-colors duration-300 transform dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 md:mx-4 md:my-0"
             href="#"
           >
             Services
           </a> */}
-          <a onClick={()=>navigate('/bookings')}
+          <a
+            onClick={() => navigate("/bookings")}
             className="my-2 text-gray-700 transition-colors duration-300 transform dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 md:mx-4 md:my-0"
             href="#"
           >
@@ -126,8 +135,8 @@ const UserNav = () => {
                 className="my-2 text-gray-700 transition-colors duration-300 transform dark:text-gray-200 hover:text-blue-500 dark:hover:text-blue-400 md:mx-4 md:my-0"
                 href="#"
               >
-               <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-  Logout
+                <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                Logout
               </a>
             </>
           ) : (

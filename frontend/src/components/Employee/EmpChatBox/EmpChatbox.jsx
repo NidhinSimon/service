@@ -1,23 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import { getuserData } from "../../../api/chatRequest";
 import { Avatar } from "flowbite-react";
-import { useFetcher } from "react-router-dom";
 import { addMessage, getMessages } from "../../../api/messageRequest";
-import {format} from 'timeago.js'
+import { format } from 'timeago.js';
+import './EmpChatBox.css';
+
 const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
   const [userData, setuserData] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setnewMessage] = useState("");
   const scroll = useRef();
+  const [notification, setNotification] = useState([]);
 
   useEffect(() => {
     const userId = chat?.members?.find((id) => id !== currentUser);
-    console.log(userId, ">>>>>>");
     const getUser = async () => {
       try {
         const { data } = await getuserData(userId);
         setuserData(data);
-        console.log(data, ">>>>>>>..");
       } catch (error) {
         console.log(error.message);
       }
@@ -28,6 +28,7 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
   useEffect(() => {
     if (receiveMessage !== null && receiveMessage.chatId === chat._id) {
       setMessages([...messages, receiveMessage]);
+      setNotification((prevNotifications) => [receiveMessage, ...prevNotifications]);
     }
   }, [receiveMessage]);
 
@@ -35,7 +36,6 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
     const fetchMessage = async () => {
       try {
         const { data } = await getMessages(chat?._id);
-        console.log(data);
         setMessages(data);
       } catch (error) {
         console.log(error.message);
@@ -78,6 +78,7 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
             </h1>
             <div className="h-16 shadow-lg">
               <Avatar className="h-16" img={userData?.profileimage} rounded-md>
+               
                 <div className="space-y-1 font-medium dark:text-white">
                   <div className="">{userData?.name}</div>
                   <div className="text-sm text-gray-500 dark:text-gray-400"></div>
@@ -86,21 +87,19 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
             </div>
             <div className="messages-box h-96 p-4 overflow-y-auto mb-4 ">
               {messages.map((m) => (
-                <>
-                  <div
-                    ref={scroll}
-                    className={
-                      m.senderId === currentUser
-                        ? "chat chat-end"
-                        : "chat chat-start"
-                    }
-                  >
-                    <div className="chat-bubble">{m.text}</div>
-                    <time className="text-xs opacity-50">
-    {format(m.createdAt)} 
-  </time>
-                  </div>
-                </>
+                <div
+                  ref={scroll}
+                  className={
+                    m.senderId === currentUser
+                      ? "chat chat-end"
+                      : "chat chat-start"
+                  }
+                >
+                  <div className="chat-bubble">{m.text}</div>
+                  <time className="text-xs opacity-50">
+                    {format(m.createdAt)}
+                  </time>
+                </div>
               ))}
             </div>
             <div className="input-box absolute bottom-0 left-0 w-full flex p-4">
@@ -113,7 +112,7 @@ const EmpChatBox = ({ chat, currentUser, setsendMessage, receiveMessage }) => {
               />
               <button
                 onClick={handleSend}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                className="px-4 py-2 bg-blue-500 text-white rounded-md hover-bg-blue-600"
               >
                 Send
               </button>

@@ -39,6 +39,8 @@ const Profile = () => {
   };
   
 
+  const [walletHistoryModal,setwalletHistoryModal]=useState(false)
+
   return (
     <>
   <UserNav/>
@@ -62,10 +64,62 @@ const Profile = () => {
                   {profile.Wallet}
                 </span>
               </h1>
-              <div className="bg-slate-100 mt-5">
+              <img onClick={()=>setwalletHistoryModal(true)} className="w-10 ml-6 h-10" src="/src/assets/history.png" alt="ddd" />
+
+
+    {walletHistoryModal && (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="relative bg-white rounded-lg shadow-md dark:bg-gray-700 w-96">
+      <div className="flex justify-between items-center p-4 bg-indigo-500 text-white rounded-t-lg">
+        <h1 className="text-2xl font-semibold">Wallet History</h1>
+        <button
+          onClick={() => setwalletHistoryModal(false)}
+          className="text-gray-300 hover:text-gray-400 focus:outline-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      <div className="bg-slate-100 p-4 h-auto overflow-y-auto rounded-b-lg">
+        {walletHistory.map((item) => (
+          <div
+            key={item._id}
+            className={`bg-white h-24 mt-4 p-4 rounded-xl flex justify-between items-center w-80 ${
+              item.type === 'Credit' ? 'bg-green-100' : 'bg-red-100'
+            }`}
+          >
+            <h1 className={`text-lg font-semibold ${item.type === 'Credit' ? 'text-green-600' : 'text-red-600'}`}>
+              <span className="text-blue-500">{item.reason}</span> -{' '}
+              {item.type === 'Credit' ? 'Credit' : 'Debit'} -{' '}
+              <span className="text-indigo-600">{item.amount} ₹</span>
+            </h1>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+              {/* <div className="bg-slate-100 mt-5">
       <div className="flex justify-between items-center">
         <h1 className="text-black font-semibold ml-5 mt-4 text-lg">Wallet History</h1>
       </div>
+ 
       <div className="bg-slate-100 mt-4 h-64 rounded-xl flex flex-col items-center">
       {walletHistory.map((item) => (
           <div
@@ -82,7 +136,7 @@ const Profile = () => {
           </div>
         ))}
       </div>
-    </div>
+    </div> */}
             </div>
           </div>
           <div className="bg-slate-200 h-36 w-full md:h-80 rounded-3xl mt-5">

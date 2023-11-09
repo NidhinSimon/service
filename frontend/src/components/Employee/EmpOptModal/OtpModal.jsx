@@ -1,30 +1,38 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-
-const OtpModal = ({ message, onClose, onConfirm,bookingId }) => {
-  const [otp, setOtp] = useState('');
+import React, { useState } from "react";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+const OtpModal = ({ message, onClose, onConfirm, bookingId }) => {
+  const [otp, setOtp] = useState("");
 
   const handleOtpChange = (e) => {
     setOtp(e.target.value);
   };
 
-  const handleConfirm =async () => {
+  const handleConfirm = async () => {
     onConfirm(otp);
-    console.log(bookingId,">>>>")
+    console.log(bookingId, ">>>>");
     try {
-        const response = await axios.post(
-          `http://localhost:5000/verifyotp/${bookingId}`,
-          { otp }
-        );
-        console.log(response,"[[[")
-        // Check the response and handle wallet transfers.
-      } catch (error) {
-        console.error("Error verifying OTP:", error);
+      const response = await axios.post(
+        `http://localhost:5000/verifyotp/${bookingId}`,
+        { otp }
+      );
+      console.log(response, "[[[");
+      if (response.message === "OTP verified, funds transferred") {
+        toast.success("booking completed successfully");
+        onClose();
       }
+
+      if (response.message === "Invalid OTP") {
+        toast.error("OTP INVALID");
+      }
+    } catch (error) {
+      toast.error("Error verifying OTP:", error);
+    }
   };
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-30 backdrop-blur-sm">
+      <Toaster />
       <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
         <button
           type="button"

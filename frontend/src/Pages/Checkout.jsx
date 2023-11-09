@@ -33,6 +33,7 @@ const Checkout = () => {
   console.log(userInfo, ">>>>");
   const userId = userInfo.userExists._id;
   const username = userInfo.userExists.name;
+  const userEmail=userInfo.userExists.email
   console.log(username, "....");
 
   const userNumber = userInfo.userExists.mobile;
@@ -213,6 +214,7 @@ const Checkout = () => {
         latitude: latitude,
         longitude: longitude,
         name: username,
+        email:userEmail
       })
       .then((res) => {
         if (res.data.url) {

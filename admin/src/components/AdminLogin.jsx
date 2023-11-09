@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import axios from 'axios'
 import {useNavigate} from 'react-router-dom'
 import toast, {Toaster} from 'react-hot-toast'
@@ -16,6 +16,17 @@ const navigate=useNavigate()
 const dispatch=useDispatch()
 
 const [login]=useLoginMutation()
+const {adminInfo}=useSelector((state)=>state.admin)
+console.log(adminInfo)
+console.log(adminInfo,"_-------")
+
+useEffect(()=>{
+  if(adminInfo)
+  {
+    navigate('/dash')
+  }
+    },[navigate,adminInfo])
+  
 
 
 const handleSubmit=async(e)=>{

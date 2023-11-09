@@ -160,10 +160,10 @@ const rejectReport = async (req, res) => {
             return res.status(404).json({ message: 'Report not found' });
         }
 
-        // Update the report status to "rejected"
+
         report.status = 'rejected';
 
-        // Save the updated report
+
         await report.save();
 
         res.json({ message: 'Report status updated successfully' });
@@ -175,58 +175,66 @@ const rejectReport = async (req, res) => {
 
 const getStats = async (req, res) => {
     try {
-      const totalUsers = await User.countDocuments();
-      
+        const totalUsers = await User.countDocuments();
 
-      const totalEarnings = await Booking.aggregate([
-        {
-          $group: {
-            _id: null,
-            totalAmount: { $sum: '$Total' }, 
-          },
-        },
-      ]);
 
-      const totalProviders=await Provider.countDocuments()
+        const totalEarnings = await Booking.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalAmount: { $sum: '$Total' },
+                },
+            },
+        ]);
 
-      const totalBookings=await Booking.countDocuments()
-  
-      res.json({
-        totalUsers,
-        totalProviders,
-        totalBookings,
-        totalEarnings: totalEarnings.length > 0 ? totalEarnings[0].totalAmount : 0,
-      });
+        const totalProviders = await Provider.countDocuments()
+
+        const totalBookings = await Booking.countDocuments()
+
+        res.json({
+            totalUsers,
+            totalProviders,
+            totalBookings,
+            totalEarnings: totalEarnings.length > 0 ? totalEarnings[0].totalAmount : 0,
+        });
     } catch (error) {
-      console.error('Error fetching admin stats:', error);
-      res.status(500).json({ error: 'An error occurred while fetching data' });
+        console.error('Error fetching admin stats:', error);
+        res.status(500).json({ error: 'An error occurred while fetching data' });
     }
-  };
+};
 
-  const getMonths = async (req, res) => {
+const getMonths = async (req, res) => {
     try {
-      const bookings = await Booking.find();
-     
-      res.json(bookings);
-    } catch (error) {
-      console.error('Error fetching bookings:', error);
-      res.status(500).json({ error: 'Failed to fetch bookings' });
-    }
-  }
-  
+        const bookings = await Booking.find();
 
-  const Earnings=async(req,res)=>{
+        res.json(bookings);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).json({ error: 'Failed to fetch bookings' });
+    }
+}
+
+
+const Earnings = async (req, res) => {
     console.log("ddugdgdgh")
     try {
-        const adminemail=process.env.ADMIN_EMAIL
-        const adminData = await admin.findOne({ email:adminemail}); // Replace with the actual admin email
+        const adminemail = process.env.ADMIN_EMAIL
+        const adminData = await admin.findOne({ email: adminemail });
         res.json({ earnings: adminData.Wallet });
-      } catch (error) {
+    } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
-      }
-  }
-  
+    }
+}
+
+const logout=async(req,res)=>{
+    try {
+        res.json({message:"Logged Out"})
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+
 
 export {
     adminLogin,
@@ -241,5 +249,6 @@ export {
     rejectReport,
     getStats,
     getMonths,
-    Earnings
+    Earnings,
+    logout
 }

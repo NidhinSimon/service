@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 import * as yup from "yup";
 import { useFormik } from "formik";
 import Spinner from './Spinner';
+import AdminNav from './AdminNav/AdminNav';
 
 const ADD = () => {
   const [name, setName] = useState('');
@@ -104,7 +105,7 @@ const ADD = () => {
 
   return (
     <>
-   <Navbar/>
+   <AdminNav/>
     <div>
       <main className="w-full h-screen flex flex-col items-center justify-center px-4">
         <Toaster/>

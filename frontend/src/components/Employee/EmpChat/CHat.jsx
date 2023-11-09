@@ -26,6 +26,10 @@ const Chat = () => {
   const [receiveMessage, setreceiveMessage] = useState(null);
   const socket = useRef();
 
+  const [notifications, setNotifications] = useState([]);
+
+  
+
   console.log(chats, ">>");
   useEffect(() => {
     const getchats = async () => {
@@ -57,6 +61,14 @@ const Chat = () => {
     });
   }, []);
 
+  const handlesend=async(chat,notification)=>{
+    console.log(chat)
+setcurrentchat(chat)
+
+  }
+
+  
+
   return (
     <>
 
@@ -66,11 +78,14 @@ const Chat = () => {
 <div className="w-1/4 bg-yellow-100 border-r p-4">
   <div className="friends-list">
     <h1 className="font-semibold">Your Conversations</h1>
-    {chats.map((chat) => (
-      <div key={chat._id} className="mt-10" onClick={() => setcurrentchat(chat)}>
-        <EmpConversation data={chat} currentUser={providerId} />
-      </div>
-    ))}
+    {chats.map((chat) => {
+              const notification = receiveMessage !== null && receiveMessage.chatId === chat._id;
+              return (
+                <div key={chat._id} className="mt-10" onClick={() => handlesend(chat,notification)}>
+                  <EmpConversation data={chat} currentUser={providerId} notification={notification} />
+                </div>
+              );
+            })}
   </div>
 </div>
 
