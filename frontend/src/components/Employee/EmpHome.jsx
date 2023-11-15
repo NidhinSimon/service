@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import Navbar from "./Navbar";
 import axios from "axios";
+import { acceptBooking } from "../../api/empApi";
 
 const EmpHome = () => {
   const { providerInfo } = useSelector((state) => state.employee);
@@ -57,10 +58,7 @@ const EmpHome = () => {
 
   const handleAccept = (bookingId) => {
     console.log("ddhgdgdgh");
-    axios
-      .put(`http://localhost:5000/boookings/accept/${bookingId}`, {
-        providerId,
-      })
+    acceptBooking(bookingId,providerId)
       .then((response) => {
         console.log(response, ">>..");
         if (response.data.success) {

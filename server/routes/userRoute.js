@@ -22,9 +22,11 @@ import {
     addwishlist,
     getWishlist,
     WalletHistory,
-    verifyGoogle
+    verifyGoogle,
+    verifyFb
 
 } from '../controller/userController.js'
+import { protect } from '../middleware/authMiddleware.js'
 
 
 router.post('/register', registerUser)
@@ -36,7 +38,7 @@ router.get('/services/:id', getServices)
 router.get('/categoryname/:id', getCategory)
 router.post('/saveaddress', saveaddress)
 router.post('/logout', logoutUser)
-router.get('/profile/:id', profileget)
+router.get('/profile/:id',protect ,profileget)
 router.post('/profileedit/:id', profileEdit)
 router.post('/cart', addtocart)
 router.get('/cart/:id', getcart)
@@ -51,9 +53,10 @@ router.post('/wishlist/add/:userId',addwishlist)
 router.get('/wishlist/:userId',getWishlist)
 
 
-router.get('/wallet-history/:userId',WalletHistory)
+router.get('/wallet-history/:userId',protect,WalletHistory)
 
 router.post("/verifyGooglelogin",verifyGoogle)
+router.post('/verifyfb',verifyFb)
 
 
 export default router

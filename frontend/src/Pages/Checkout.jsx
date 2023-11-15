@@ -16,6 +16,7 @@ import { Button } from "primereact/button";
 import { FaTrash } from "react-icons/fa";
 import User from "../../../server/models/userModel";
 import AddressModal from "../components/USer/USerModal/AddressModal";
+import { deletecart } from "../api/userApi";
 
 const Checkout = () => {
   const [sidebar, setsidebar] = useState(false);
@@ -81,9 +82,9 @@ const Checkout = () => {
   const handleRemove = async (item) => {
     // dispatch(removeFromCart(item));
 
-    await axios.delete(
-      `http://localhost:5000/users/cart/${userid}/${item.serviceId}`
-    );
+  
+
+    deletecart(userid,item.serviceId)
     const updatedcart = cart.filter((i) => i.serviceId !== item.serviceId);
     setCart(updatedcart);
     Swal.fire({

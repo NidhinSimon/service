@@ -6,6 +6,7 @@ import Category from '../models/CategoryModel.js'
 import Booking from "../models/BookingModel.js";
 import Provider from "../models/providerModel.js";
 import Report from "../models/ReportModel.js";
+import axios from 'axios'
 
 import Wallet from '../models/wallerHistoryModal.js'
 
@@ -21,13 +22,14 @@ const registerUser = async (req, res) => {
     const user = await User.create({
       name,
       email,
-      mobile
+      mobile,
+      role:'user'
     })
     if (user) {
       const token = generateToken(res, user._id)
       console.log("inside if")
       res.status(200).json({
-        user,
+        userExists,
         token
       })
       console.log(token, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -60,6 +62,7 @@ const loginUser = async (req, res) => {
 
     if (userExists) {
       const token = generateToken(res, userExists._id)
+      console.log(token,"---------------------------------")
       console.log("User exists:", userExists);
       res.json({
         message: "User login successful",
@@ -102,9 +105,41 @@ const verifyGoogle = async (req, res) => {
   } catch (error) {
     console.log(error.message)
   }
-
-
 }
+
+
+  const verifyFb = async (req, res) => {
+    console.log("-------------------------------------------------------------------------------------------------------------------------", req.body);
+    const { accessToken } = req.body; // Fix typo here
+  
+    try {
+      const response = await axios.get(`https://graph.facebook.com/v15.0/me?access_token=${accessToken}&fields=id,email,name`);
+  
+      const { id, email, name } = response.data;
+      console.log(response,'=========================================')
+  
+      const userExists = await User.findOne({ email: email });
+  
+      if (userExists) {
+        const token = generateToken(res, userExists._id);
+        console.log("User exists:", userExists);
+        res.json({
+          message: "User login successful",
+          userExists,
+          token
+        });
+      } else {
+        // User does not exist, send a notification
+        console.log("User not registered");
+        res.status(404).json({ message: "No account associated with this email" });
+      }
+  
+    } catch (error) {
+      console.error('Error verifying Facebook token:', error);
+      res.status(500).json({ message: 'Error verifying Facebook token' });
+    }
+  }
+  
 
 
 const getServices = async (req, res) => {
@@ -160,8 +195,9 @@ const logoutUser = async (req, res) => {
 }
 
 const profileget = async (req, res) => {
-
+console.log("sijsisui")
   const user = await User.findById(req.params.id)
+  console.log(user,"------------")
 
   res.json(user)
 }
@@ -422,6 +458,7 @@ const getAddress = async (req, res) => {
 
 const addwishlist = async (req, res) => {
   try {
+    console.log("dd")
     const { userId } = req.params;
     const { serviceId } = req.body;
 
@@ -499,6 +536,7 @@ export {
   addwishlist,
   getWishlist,
   WalletHistory,
-  verifyGoogle
+  verifyGoogle,
+  verifyFb
 
 }

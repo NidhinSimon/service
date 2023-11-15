@@ -44,6 +44,10 @@ const userSchema = mongoose.Schema({
     EndOtp:{
         type:Number
     },
+    role:{
+        type:String,
+
+    },
     wishlist: [
         {
           type: mongoose.Schema.Types.ObjectId,

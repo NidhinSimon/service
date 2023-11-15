@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { verifyOtp } from "../../../api/empApi";
 const OtpModal = ({ message, onClose, onConfirm, bookingId }) => {
   const [otp, setOtp] = useState("");
 
@@ -12,10 +13,7 @@ const OtpModal = ({ message, onClose, onConfirm, bookingId }) => {
     onConfirm(otp);
     console.log(bookingId, ">>>>");
     try {
-      const response = await axios.post(
-        `http://localhost:5000/verifyotp/${bookingId}`,
-        { otp }
-      );
+      const response = await verifyOtp(bookingId,otp)
       console.log(response, "[[[");
       if (response.message === "OTP verified, funds transferred") {
         toast.success("booking completed successfully");

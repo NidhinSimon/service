@@ -5,13 +5,14 @@ import Navbar from '../Navbar';
 import { useSelector } from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import EmpNavbar from '../EmpNavbar/EmpNavbar';
+import { dashBoard } from '../../../api/empApi';
 
 Chart.register(LinearScale,CategoryScale,BarElement);
 
 
 const EmpDash = () => {
   const { providerInfo } = useSelector((state) => state.employee);
-  const providerId = providerInfo.provider._id;
+ 
 
 const navigate=useNavigate()
 
@@ -28,6 +29,7 @@ useEffect(()=>{
 
 },[providerInfo,navigate])
 
+const providerId = providerInfo.provider._id;
 
   const [empStats, setEmpStats] =useState({
     totalBookings: 0,
@@ -47,7 +49,7 @@ useEffect(()=>{
   });
 
   useEffect(() => {
-    fetch(`http://localhost:5000/getstatistics/${providerId}`)
+    dashBoard(providerId)
       .then((response) => response.json())
       .then((data) => {
         setEmpStats(data);

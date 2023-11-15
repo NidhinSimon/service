@@ -35,6 +35,7 @@ const EmpNavbar = () => {
       if (res.data.message === "Logged Out Successfully") {
         localStorage.removeItem("providerInfo");
         toast.success("logged out Successfully");
+        navigate('/emplogin')
       }
     } catch (error) {
       console.log(error.message);

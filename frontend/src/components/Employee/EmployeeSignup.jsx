@@ -6,6 +6,8 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate } from "react-router-dom";
 import Map from "./Map";
+import { getCategories } from "../../api/adminApiRoute";
+import { addEmployee } from "../../api/empApi";
 
 const EmployeeSignup = () => {
   const [click, setclick] = useState(false);
@@ -50,7 +52,7 @@ const EmployeeSignup = () => {
   useEffect(() => {
     const categories = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/admin/categories");
+        const res = await getCategories()
         console.log(
           res,
           "--------------------------------------------------------"
@@ -106,7 +108,7 @@ const EmployeeSignup = () => {
     validationSchema: validationSchema,
     onSubmit: async (value) => {
       try {
-        const res = await axios.post("http://localhost:5000/emp", {
+        const res =  await addEmployee({
           ...value,
           licenseimage: licenseimage,
           profileimage: profileimage,

@@ -3,25 +3,32 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import UserNav from "./UserNav";
+import { getCategories } from "../api/adminApiRoute";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger"; // Import ScrollTrigger
+
+gsap.registerPlugin(ScrollTrigger);
 
 const UserHome = () => {
   const { userInfo } = useSelector((state) => state.user);
-console.log(userInfo,'>.............')
+  console.log(userInfo, ">.............");
   const [categories, setCategories] = useState([]);
 
   const navigate = useNavigate();
 
-  useEffect(()=>{
-    if(userInfo)
-    {
-      navigate('/home')
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/home");
     }
-  },[,userInfo])
+  }, [, userInfo]);
+
+
+  
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/admin/categories")
+    getCategories()
       .then((res) => {
+        
         setCategories(res.data);
       })
       .catch((error) => {
@@ -71,29 +78,30 @@ console.log(userInfo,'>.............')
         </div>
       </header>
 
-      <h1 className="text-center mt-16 text-xl font-semibold">OUR SERVICES</h1>
-      <div className="grid grid-cols-2  sm:grid-cols-3 gap-6 ml-12 md:grid-cols-3 lg:grid-cols-4 mx-auto  sm:mx-12 md:ml-36 lg:ml-40 mt-12">
-        {categories.map((category) => (
-          <div
-            onClick={() => handleServiceCLick(category._id)}
-            key={category.id}
-            className="card card-compact w-56 bg-base-100 shadow-xl rounded-2xl border"
-          >
-            <figure>
-              <img
-                src={category.categoryimage}
-                alt={category.name}
-                className="h-48 w-40 mt-6 mx-auto"
-              />
-            </figure>
-            <div className="card-body">
-              <h2 className="card-title text-center text-lg ">
-                {category.name}
-              </h2>
-            </div>
-          </div>
-        ))}
+      <h1 className="text-center  text-xl font-semibold">OUR SERVICES</h1>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 ml-12 md:grid-cols-3 lg:grid-cols-4 mx-auto sm:mx-12 md:ml-36 lg:ml-40 mt-12">
+  {categories.map((category) => (
+    <div
+      onClick={() => handleServiceCLick(category._id)}
+      key={category.id}
+      className="card card-compact bg-white hover:shadow-xl rounded-2xl overflow-hidden transform transition-transform duration-300 hover:scale-105 cursor-pointer animate-on-scroll"
+    >
+      <figure className="overflow-hidden">
+        <img
+          src={category.categoryimage}
+          alt={category.name}
+          className="h-49 w-full object-top "
+        />
+      </figure>
+      <div className="p-4">
+        <h2 className="text-center text-lg font-semibold mb-2">
+          {category.name}
+        </h2>
       </div>
+    </div>
+  ))}
+</div>
+
 
       {/* {Array.from({ length: 6 }, (_, index) => (
     <div

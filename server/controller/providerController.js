@@ -8,7 +8,7 @@ import Service from "../models/serviceModel.js";
 
 import Admin from "../models/adminModel.js";
 import WalletHistory from "../models/wallerHistoryModal.js";
-
+import { generateEmployeeToken } from "../utils/generateToke.js";
 let io;
 
 
@@ -46,7 +46,8 @@ const registerProvider = async (req, res) => {
                 category: selectedCategory,
                 latitude,
                 longitude,
-                address
+                address,
+                role:"employee"
             })
             const b = await newProvider.save()
             console.log(b, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
@@ -130,16 +131,20 @@ const rejectProvider = async (req, res) => {
 
 const loginProvider = async (req, res) => {
     const { mobile } = req.body;
+    console.log(mobile,"//////////////")
 
     try {
         const provider = await Provider.findOne({ mobile })
+        console.log(provider,"--------------")
+        const token=generateEmployeeToken(res,provider._id)
         if (provider) {
-            res.json({ message: "User Login Successfull", provider })
+            res.json({ message: "Provider Login Successfull", provider ,token})
 
         } else {
-            res.json({ message: "User does not exist" })
+            res.json({ message: "provider does not exist" })
         }
     }
+   
     catch (error) {
         console.log(error.message)
     }

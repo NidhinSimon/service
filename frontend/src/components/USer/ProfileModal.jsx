@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { EditProfile } from "../../api/userApi";
 const ProfileModal = ({ profile, onclose }) => {
   const [editProfile, setEditProfile] = useState({
     name: profile.name,
@@ -10,10 +11,9 @@ const ProfileModal = ({ profile, onclose }) => {
   const handleSubmit = async (id) => {
     console.log(id, "___________________");
     console.log(editProfile, "------------------------------");
-    const res = await axios.post(
-      `http://localhost:5000/users/profileedit/${id}`,
-      editProfile
-    );
+    const res = await EditProfile(id)
+
+
     console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>..");
   };
 

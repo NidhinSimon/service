@@ -6,6 +6,7 @@ import Spinner from "./Spinner";
 import io from "socket.io-client";
 import OtpModal from "./EmpOptModal/OtpModal";
 import toast,{Toaster} from 'react-hot-toast'
+import { cancelBooking } from "../../api/empApi";
 
 const UpcomingBookings = () => {
   const [upcomingBookings, setUpcomingBookings] = useState([]);
@@ -23,8 +24,7 @@ const UpcomingBookings = () => {
   const socket = io("http://localhost:5000");
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/upcoming/${providerId}`)
+    upcomingBookings(providerId)
       .then((response) => {
         const data = response.data;
         console.log(data, ">");
@@ -72,7 +72,7 @@ const UpcomingBookings = () => {
   
   const handleCancel = async (bookingId) => {
     try {
-      const response = await axios.post(`http://localhost:5000/cancel/${bookingId}`);
+      const response = await cancelBooking(bookingId)
       if (response.data.success) {
         const updatedBookings = upcomingBookings.filter((booking) => booking._id !== bookingId);
         setUpcomingBookings(updatedBookings);

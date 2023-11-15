@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 
 
 export const generateToken = (res, user_id) => {
-    const token = jwt.sign({ user_id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ user_id,role: 'user'  }, process.env.JWT_SECRET, {
         expiresIn: '2d',
     })
 
@@ -21,7 +21,7 @@ export const generateToken = (res, user_id) => {
 export const generateAdminToken = (res, admin_id) => {
 
     try {
-        const adminToken = jwt.sign({ admin_id }, process.env.JWT_SECRET_ADMIN, {
+        const adminToken = jwt.sign({ admin_id ,role: 'admin' }, process.env.JWT_SECRET, {
             expiresIn: '2d',
         })
 
@@ -44,10 +44,10 @@ export const generateAdminToken = (res, admin_id) => {
 
 
 
-export const generateEmployeeToken = (res, email_id) => {
+export const generateEmployeeToken = (res, emp_id) => {
 
     try {
-        const empToken = jwt.sign({ email_id }, process.env.JWT_SECRET_EMPLOYEE, {
+        const empToken = jwt.sign({ emp_id,role: 'employee'  }, process.env.JWT_SECRET, {
             expiresIn: '2d',
         })
 

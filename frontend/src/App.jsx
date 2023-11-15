@@ -45,6 +45,7 @@ import Chat from "./components/Employee/EmpChat/CHat";
 import Invoice from "./Pages/Invoice";
 import EmpDash from "./components/Employee/EmpDashboard/EmpDash";
 import EmpPrivateRoute from "./Pages/EmpPRivateRoute";
+import MapComponent from "./components/Employee/TestMap/TestMap";
 
 function App() {
   return (
@@ -82,6 +83,8 @@ function App() {
             {/* Emp Public Route  */}
 
             <Route path="/emplogin" element={<Login />} />
+
+            <Route path="/maptest" element={<MapComponent/>}/>
          
 
             {/* Emp private Route  */}

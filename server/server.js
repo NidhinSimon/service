@@ -18,6 +18,7 @@ import chatRoute from './routes/chatRoute.js';
 import messageRouter from './routes/MessgaeRoute.js';
 import bookingRoute from './routes/bookingRoute.js';
 import { hai } from './controller/bookingController.js';
+import { errorHandler, notFound } from './middleware/errorMiddleware.js';
 
 
 const port = process.env.PORT;
@@ -149,6 +150,10 @@ app.use(serviceRoute);
 app.use(chatRoute)
 app.use(messageRouter)
 app.use(bookingRoute)
+
+app.use(notFound)
+app.use(errorHandler)
+
 
 
 

@@ -6,6 +6,9 @@ import ProfileModal from "../components/USer/ProfileModal";
 import { FaRupeeSign } from "react-icons/fa";
 import UserNav from "./UserNav";
 import { toast, Toaster } from "react-hot-toast";
+import { getProfile, getWallet } from "../api/userApi";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
   const [profile, setProfile] = useState([]);
@@ -14,15 +17,36 @@ const Profile = () => {
   const [walletHistory, setWalletHistory] = useState([]);
 
 
+  const {userInfo}=useSelector((state)=>state.user)
+  const token=userInfo.token
+
+  console.log(token,"---------")
+
+  console.log(userInfo,"..")
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const profileLoad = async () => {
-      const res = await axios.get(`http://localhost:5000/users/profile/${id}`);
+
+      if (!userInfo || !token) {
+    
+        navigate("/login");
+    
+        toast.error("Please log in to view this page");
+        return;
+      }
+
+       const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+      const res = await getProfile(id,headers)
+
       setProfile(res.data);
       console.log(res, ">>>>>>>>>>>>>>>>>>>>");
 
-      const walletHistoryRes = await axios.get(`http://localhost:5000/users/wallet-history/${id}`);
+      const walletHistoryRes = await getWallet(id,headers)
+      console.log(walletHistoryRes,"//")
       setWalletHistory(walletHistoryRes.data);
     };
     profileLoad();
@@ -44,6 +68,8 @@ const Profile = () => {
   return (
     <>
   <UserNav/>
+<Toaster/>
+  
       <div className="bg-slate-100 h-auto p-4 md:p-0 mt-6">
         <div className="bg-white h-1/2 rounded-2xl p-4 md:p-8">
           <div className="bg-slate-200  md:h-60 w-full rounded-lg flex flex-col md:flex-row items-center">

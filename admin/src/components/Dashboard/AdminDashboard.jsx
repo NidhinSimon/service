@@ -20,7 +20,7 @@ const AdminDashboard = () => {
     } else {
       navigate("/login");
     }
-  }, []);
+  }, [adminInfo,navigate]);
 
   const [adminStats, setAdminStats] = useState({
     totalUsers: 0,

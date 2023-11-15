@@ -18,6 +18,7 @@ import UserNav from "./UserNav";
 import { addToCart } from "../slices/userSlice";
 import { useAddCartMutation } from "../slices/backendSlice";
 import toast,{Toaster} from 'react-hot-toast'
+import { addWishlist, deletecart, getCart, getServices } from "../api/userApi";
 
 const ServiceDetail = () => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(true);
@@ -58,7 +59,7 @@ const ServiceDetail = () => {
 
   useEffect(() => {
     const cartfetch = async () => {
-      const res = await axios.get(`http://localhost:5000/users/cart/${userId}`);
+      const res = await getCart(userId);
       setCart(res.data);
       console.log(res);
     };
@@ -67,7 +68,7 @@ const ServiceDetail = () => {
 
   useEffect(() => {
     const servicesFetch = async () => {
-      const res = await axios.get(`http://localhost:5000/users/services/${id}`);
+      const res = await getServices(id);
       console.log(res, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.");
       setServices(res.data);
 
@@ -103,12 +104,7 @@ const ServiceDetail = () => {
 
   const handleAddToWishlist = async (serviceId) => {
     try {
-      const response = await axios.post(
-        `http://localhost:5000/users/wishlist/add/${userId}`,
-        {
-          serviceId,
-        }
-      );
+      const response = await addWishlist(userId,serviceId)
   
       if (response.status === 200) {
         Swal.fire({
@@ -138,9 +134,7 @@ const ServiceDetail = () => {
   const handleRemove = async (item) => {
     // dispatch(removeFromCart(item));
 
-    await axios.delete(
-      `http://localhost:5000/users/cart/${userId}/${item.serviceId}`
-    );
+    await deletecart(userId,item.serviceId)
     const updatedcart = cart.filter((i) => i.serviceId !== item.serviceId);
     setCart(updatedcart);
     Swal.fire({

@@ -21,27 +21,27 @@ import { useGoogleMutation } from "../slices/backendSlice";
 import axios from "axios";
 const LoginScreen = () => {
   const [number, setNumber] = useState("");
-  const [otp, setOtp] = useState("");
-  const [otpPage, setOtpPage] = useState(false);
+  const [otp, setOtp] = useState(Array(6).fill("")); 
+  const [otpPage, setOtpPage] = useState(true);
   const [otpTimer, setOtpTimer] = useState(60);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
 
   useEffect(() => {
     let timerInterval;
-
-    if (otpTimer > 0) {
+  
+    if (otpPage && otpTimer > 0) {
       timerInterval = setInterval(() => {
         setOtpTimer((prevTimer) => prevTimer - 1);
       }, 1000);
     } else {
       setIsResendDisabled(false);
     }
-
+  
     return () => {
       clearInterval(timerInterval);
     };
-  }, [otpTimer]);
-
+  }, [otpPage, otpTimer]);
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -77,8 +77,10 @@ const LoginScreen = () => {
   };
 
   const OtpVerify = () => {
+    const otpString = otp.join("");
+    console.log("Verifying OTP:", otpString);
     window.confirmationResult
-      .confirm(otp)
+      .confirm(otpString)
       .then(async (res) => {
         console.log(res, "resultttt");
         navigate("/home");
@@ -116,6 +118,15 @@ const LoginScreen = () => {
     PhoneVerify();
     setIsResendDisabled(true);
     setOtpTimer(60);
+  };
+
+  const handlePinInputChange = (index, event) => {
+    const newValue = event.target.value;
+    setOtp((prevOtp) => {
+      const newOtp = [...prevOtp];
+      newOtp[index] = newValue;
+      return newOtp;
+    });
   };
 
 
@@ -170,42 +181,45 @@ dispatch(googlelogin({...res}))
                 <h1 className="text-orange-400 relative  top-10 left-28 text-lg">
                   Enter The OTP{" "}
                 </h1>
-                <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-slate-200 my-10  ">
-                  <input
-                    type="number"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    className="ml-20"
-                  />
-                </section>
+                <section className="max-w-4xl p-6 mx-auto bg-white rounded-md shadow-md dark:bg-slate-200 my-10">
+                <PinInput>
+  {otp.map((value, index) => (
+    <PinInputField
+      key={index}
+      value={value}
+      onChange={(e) => handlePinInputChange(index, e)}
+      className="w-12 h-12 border border-gray-300 p-2 rounded-md text-center"
+    />
+  ))}
+</PinInput>
 
-                {otpTimer > 0 ? (
-                  <>
-                    <button
-                      className="btn btn-primary relative bottom-34 left-32 text-lg"
-                      onClick={OtpVerify}
-                    >
-                      Verify
-                    </button>
-                    <div className="text-center mt-2">
-                      OTP will expire in {otpTimer} seconds.
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-center mt-2">
-                    {isResendDisabled ? (
-                      <span className="text-gray-400">Resend OTP</span>
-                    ) : (
-                      <button
-                        className="btn btn-secondary"
-                        onClick={handleResendOtp}
-                        disabled={isResendDisabled}
-                      >
-                        Resend OTP
-                      </button>
-                    )}
-                  </div>
-                )}
+
+  </section>
+
+  {otpTimer > 0 ? (
+  <>
+    <button
+      className="btn btn-primary relative bottom-34 left-32 text-lg"
+      onClick={OtpVerify}
+    >
+      Verify
+    </button>
+    <div className="text-center mt-2">
+      OTP will expire in {otpTimer} seconds.
+    </div>
+  </>
+) : (
+  <div className="text-center mt-2">
+    <button
+      className="btn btn-secondary"
+      onClick={handleResendOtp}
+      disabled={isResendDisabled}
+    >
+      Resend OTP
+    </button>
+  </div>
+)}
+
               </div>
             ) : (
               <div className="w-full px-6 py-8 md:px-8 lg:w-1/2">

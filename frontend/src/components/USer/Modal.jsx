@@ -58,7 +58,7 @@ const Modal = ({ closemodal, handlelocation }) => {
       const newMap = new mapboxgl.Map({
         container: "map",
         style: "mapbox://styles/mapbox/streets-v11",
-        center: [77.580643, 12.972442],
+        center: [75.862640, 12.250400],
         zoom: 15,
       });
 
@@ -86,12 +86,12 @@ const Modal = ({ closemodal, handlelocation }) => {
 
   const handleUseMyLocationClick = () => {
     setIsLoadingMap(true); // Set loading state while fetching geolocation
-
+  
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-
+  
           map.setCenter([longitude, latitude]);
           addMarker(longitude, latitude);
           reversegeocode(longitude, latitude);
@@ -102,6 +102,10 @@ const Modal = ({ closemodal, handlelocation }) => {
         (error) => {
           console.error("Error getting user location:", error);
           setIsLoadingMap(false); // Clear loading state in case of an error
+        },
+        {
+          enableHighAccuracy: true, // Use GPS for more accurate location
+          maximumAge: 30000, // Cache the location for 30 seconds
         }
       );
     } else {
@@ -109,21 +113,22 @@ const Modal = ({ closemodal, handlelocation }) => {
       setIsLoadingMap(false); // Clear loading state in case geolocation is not available
     }
   };
-
+  
   const reversegeocode = (lng, lat) => {
+    console.log(lng,lat)
     axios
       .get(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxgl.accessToken}`
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyA04gExT_3ABGyN3KoRT70m1PdQ0RDWWVA`
       )
       .then((response) => {
-        const place = response.data.features[0];
-        const formattedAddress = place.place_name;
-        setAddress(formattedAddress);
+        const address = response.data.results[0].formatted_address;
+        setAddress(address);
       })
       .catch((error) => {
         console.error("Error reverse geocoding:", error);
       });
   };
+  
 
   return (
     <div>

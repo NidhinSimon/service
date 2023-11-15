@@ -78,7 +78,11 @@ const providerSchema = mongoose.Schema({
     Wallet: {
         type: Number,
         default: 0
-    }
+    },
+    role:{
+        type:String,
+
+    },
 }, {
     timestamps: true
 });
